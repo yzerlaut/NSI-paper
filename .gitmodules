@@ -1,0 +1,9 @@
+[submodule "graphs"]
+	path = graphs
+	url = https://yzerlaut@bitbucket.org/yzerlaut/graphs.git
+[submodule "data_analysis"]
+	path = data_analysis
+	url = https://yzerlaut@bitbucket.org/yzerlaut/data_analysis.git
+[submodule "neural_network_dynamics"]
+	path = neural_network_dynamics
+	url = https://yzerlaut@bitbucket.org/yzerlaut/neural_network_dynamics.git
