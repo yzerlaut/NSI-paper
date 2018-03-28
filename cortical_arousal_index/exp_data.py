@@ -95,7 +95,7 @@ def test_different_wavelets(args):
                                      args.wavelet_discretization)
     
 
-    DATASET = get_full_dataset(args)[:1]
+    DATASET = get_full_dataset(args)
     DATA = []
     CROSS_CORRELS = np.zeros((len(CENTER_FREQUENCIES), len(BAND_LENGTH_FACTOR), len(DATASET)))
     
@@ -105,7 +105,8 @@ def test_different_wavelets(args):
         output = mp.Queue()
         
     def run_func(icell, output):
-        print(DATASET[icell]['files'][0].replace('.abf', '_wavelet_scan.npy'))
+        print('=================================================')
+        print('running cell', icell, '[...]')
         CROSS_CORRELS0 = np.zeros((len(CENTER_FREQUENCIES), len(BAND_LENGTH_FACTOR)))
         for icf, ibl in product(range(len(CENTER_FREQUENCIES)),
                                 range(len(BAND_LENGTH_FACTOR))):
@@ -119,6 +120,7 @@ def test_different_wavelets(args):
             CROSS_CORRELS0[icf, ibl] = cc
         np.save(DATASET[icell]['files'][0].replace('.abf', '_wavelet_scan.npy'),
                 CROSS_CORRELS0)
+        print('=================================================')
             
     for icell, cell in enumerate(DATASET):
         print('Cell '+str(icell+1)+' :', cell['files'][0])
