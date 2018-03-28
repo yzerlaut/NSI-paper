@@ -45,12 +45,6 @@ def show_dataset(directory):
     pprint.pprint(get_full_dataset(args, include_only_chosen=False))
     DATASET = get_full_dataset(args, include_only_chosen=True)
     pprint.pprint(DATASET)
-    # TIME = np.array([0 for i in range(len(DATASET))])
-    # for i, cell in enumerate(DATASET):
-    #     icounter = 0
-    #     for f in cell['files']:
-    #         t_muV, pow_lf, smooth_pow_lf, muV = np.load(\
-    #                     f.replace('.abf', '_low_freq_and_muV.npy'))
 
 ###############################################################
 ##          LOAD DATAFILES (ABF format)                      ##
@@ -117,19 +111,17 @@ def test_different_wavelets(args):
             cf = CENTER_FREQUENCIES[icf]
             blf = BAND_LENGTH_FACTOR[ibl]
             print('running ', icf, ibl, 'on cell', icell, '[...]')
-            # functions.preprocess_LFP(DATA[icell],
-            #                          freqs=np.linspace(cf/blf, cf*blf, args.wavelet_number),
-            #                          smoothing=0.) # HERE NO SMOOTHING YET !!
-            # cc = np.abs(np.corrcoef(DATA[icell]['new_Vm'], DATA[icell]['pLFP']))[0,1]
-            # CROSS_CORRELS[icf, ibl, icell] = cc
-            CROSS_CORRELS0[icf, ibl] = np.abs(np.random.randn()*cf*blf)*DATA[icell]
-            np.save(DATASET[icell]['files'][0].replace('.abf', '_wavelet_scan.npy'),
-                    CROSS_CORRELS0)
+            functions.preprocess_LFP(DATA[icell],
+                                     freqs=np.linspace(cf/blf, cf*blf, args.wavelet_number),
+                                     smoothing=0.) # HERE NO SMOOTHING YET !!
+            cc = np.abs(np.corrcoef(DATA[icell]['new_Vm'], DATA[icell]['pLFP']))[0,1]
+            CROSS_CORRELS0[icf, ibl] = cc
+        np.save(DATASET[icell]['files'][0].replace('.abf', '_wavelet_scan.npy'),
+                CROSS_CORRELS0)
             
     for icell, cell in enumerate(DATASET):
         print('Cell '+str(icell+1)+' :', cell['files'][0])
-        # DATA.append(load_data(cell['files'][0], args))
-        DATA.append(icell)
+        DATA.append(load_data(cell['files'][0], args))
         
         if args.parallelize:
             PROCESSES.append(mp.Process(target=run_func, args=(icell, output)))
