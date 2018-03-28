@@ -76,7 +76,7 @@ def preprocess_LFP(data,
         dt = data['dt']
     
     # performing wavelet transform
-    data['W'] = my_cwt(data[Extra_key], freqs, dt) 
+    data['W'] = my_cwt(data[Extra_key].flatten(), freqs, dt) 
     data['pLFP_freqs'] = freqs # keeping track of the frequency used
 
     # taking the mean power over the frequency content considered
@@ -99,8 +99,8 @@ def preprocess_LFP(data,
         
     data['new_t'] = np.arange(len(data['pLFP']))*new_dt+data['t'][0]
     data['new_indices'] = np.arange(len(data['pLFP']))*isubsmpl # indices of data['t'] corresponding to data['new_t']
-    data['new_Vm'] = data['Vm'][data['new_indices']] # subsampled Vm corresponding to the
-    data['new_Extra'] = data['Extra'][data['new_indices']]
+    data['new_Vm'] = data['Vm'].flatten()[data['new_indices']] # subsampled Vm corresponding to the
+    data['new_Extra'] = data['Extra'].flatten()[data['new_indices']]
     
     data['new_dt'] = new_dt
     
