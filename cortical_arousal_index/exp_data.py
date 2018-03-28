@@ -95,7 +95,7 @@ def test_different_wavelets(args):
                                      args.wavelet_discretization)
     
 
-    DATASET = get_full_dataset(args)
+    DATASET = get_full_dataset(args)[:1]
     DATA = []
     CROSS_CORRELS = np.zeros((len(CENTER_FREQUENCIES), len(BAND_LENGTH_FACTOR), len(DATASET)))
     
