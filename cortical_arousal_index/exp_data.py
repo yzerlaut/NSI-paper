@@ -105,6 +105,7 @@ def test_different_wavelets(args):
         output = mp.Queue()
         
     def run_func(icell, output):
+        print(DATASET[icell]['files'][0].replace('.abf', '_wavelet_scan.npy'))
         CROSS_CORRELS0 = np.zeros((len(CENTER_FREQUENCIES), len(BAND_LENGTH_FACTOR)))
         for icf, ibl in product(range(len(CENTER_FREQUENCIES)),
                                 range(len(BAND_LENGTH_FACTOR))):
