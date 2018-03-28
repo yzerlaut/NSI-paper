@@ -62,20 +62,26 @@ def gaussian_smoothing(Signal, idt_sbsmpl=10):
     return gaussian_filter1d(Signal, idt_sbsmpl)
 
 def preprocess_LFP(data,
-                   freqs = np.linspace(50, 300, 5),
+                   freqs = np.linspace(50, 300, 5), debug=False,
                    new_dt = 5e-3, smoothing=20e-3, pLFP_unit='$\mu$V'):
     """
     performs continuous wavelet transform
     """
 
+    if debug:
+        Extra_key = 'sbsmpl_Extra'
+        dt = data['sbsmpl_dt']
+    else:
+        Extra_key = 'Extra'
+        dt = data['dt']
     
     # performing wavelet transform
-    data['W'] = my_cwt(data['Extra'], freqs, data['dt']) 
+    data['W'] = my_cwt(data[Extra_key], freqs, dt) 
     data['pLFP_freqs'] = freqs # keeping track of the frequency used
 
     # taking the mean power over the frequency content considered
     W2 = np.abs(data['W']).mean(axis=0)
-    isubsmpl = int(round(new_dt/data['dt']))
+    isubsmpl = int(round(new_dt/dt))
 
     # then smoothing and subsampling
     if smoothing>0:
