@@ -78,12 +78,6 @@ def load_data(fn, args,
         
     raw_data = load_file(fn, zoom=[t0, t1])
     
-    # building a dictionary
-    if len(fn.split('Wild_Typ'))>1:
-        Vm_index = 1
-    else:
-        Vm_index = 0
-        
     data = {'t':raw_data[0]-raw_data[0][0],
             'Vm':raw_data[1][1],
             'Extra':raw_data[1][0],
@@ -1296,6 +1290,23 @@ def plot_raw_data(args):
                   pdf_title='raw DATASET: '+cell['info'])
 
 
+
+def test_different_wavelets(args):
+    
+    CENTER_FREQUENCIES = np.logspace(np.log(args.center_wavelet_freq_min)/np.log(10),
+                                     np.log(args.center_wavelet_freq_max)/np.log(10),
+                                     args.wavelet_discretization)
+    BAND_LENGTH_FACTOR = np.linspace(args.factor_wavelet_freq_min,
+                                     args.factor_wavelet_freq_max,
+                                     args.wavelet_discretization)
+    
+    CROSS_CORRELS = np.zeros((len(CENTER_FREQUENCIES), len(BAND_LENGTH_FACTOR)))
+
+    for i, cf in enumerate(CENTER_FREQUENCIES):
+        for j, blf in enumerate(BAND_LENGTH_FACTOR):
+            preprocess_LFP(data_awake, freqs=np.linspace(cf/blf, cf*blf, args.wavelet_number))        
+            CROSS_CORRELS[i,j] = np.abs(np.corrcoef(data_awake['new_Vm'], data_awake['pLFP']))[0,1]
+        
 if __name__=='__main__':
     
     import argparse
@@ -1304,7 +1315,15 @@ if __name__=='__main__':
                     formatter_class=argparse.RawTextHelpFormatter)
     # type of analysis or plotting
     parser.add_argument("--show_dataset", help="",action="store_true")
-    parser.add_argument("--plot_raw_data", help="",action="store_true")
+    #### TEST DIFFERENT WAVELETS
+    parser.add_argument("--test_different_wavelets", help="",action="store_true")
+    parser.add_argument('--wavelet_number', type=int, default=5)    
+    parser.add_argument('--wavelet_discretization', type=int, default=2)    
+    parser.add_argument('-cfmi', '--center_wavelet_freq_min', type=float, default=1)    
+    parser.add_argument('-cfma', '--center_wavelet_freq_max', type=float, default=1000)    
+    parser.add_argument('-ffmi', '--factor_wavelet_freq_min', type=float, default=1)    
+    parser.add_argument('-ffma', '--factor_wavelet_freq_max', type=float, default=1000)    
+    
     parser.add_argument("--compute_low_freq_and_muV", action="store_true")
     parser.add_argument("--plot_low_freq_and_muV", action="store_true")
     parser.add_argument("--compute_spikes", action="store_true")
@@ -1367,8 +1386,8 @@ if __name__=='__main__':
     # dataset
     if args.show_dataset:
         show_dataset(args)
-    elif args.plot_raw_data:
-        plot_raw_data(args)
+    elif args.test_different_wavelets:
+        test_different_wavelets(args)
     # low freq analysis
     elif args.compute_low_freq_and_muV:
         compute_low_freq_and_muV(args)
