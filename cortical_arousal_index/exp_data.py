@@ -256,23 +256,24 @@ def test_different_smoothing(args):
     OUTPUT = {'Params':args,
               'T_SMOOTH' : T_SMOOTH,
               'CROSS_CORRELS' : CROSS_CORRELS}
-
+    
     np.savez(args.datafile_output, **OUTPUT)
     
-
 def plot_test_different_smoothing(args):
 
     OUTPUT = dict(np.load(args.datafile_input))
     print(OUTPUT)
+    DATASET = get_full_dataset(args, include_only_chosen=False)
     
     fig_optimum, ax = figure(figsize=(.3, .16), right=.7, top=.9, bottom=1.2, left=.9)
-    # for i in range(OUTPUT['CROSS_CORRELS'].shape[1]):
-    #     ax.plot(OUTPUT['T_SMOOTH'], OUTPUT['CROSS_CORRELS'][:,i])
-    ax.plot(OUTPUT['T_SMOOTH'], np.mean(OUTPUT['CROSS_CORRELS'], axis=-1), color='k')
+    for i in range(OUTPUT['CROSS_CORRELS'].shape[1]):
+        ax.plot(OUTPUT['T_SMOOTH'], OUTPUT['CROSS_CORRELS'][:,i])
+        print(DATASET[i]['files'][0], np.mean(OUTPUT['CROSS_CORRELS'][:,i]))
+    # ax.plot(OUTPUT['T_SMOOTH'], np.mean(OUTPUT['CROSS_CORRELS'], axis=-1), color='k')
     # ax.fill_between(OUTPUT['T_SMOOTH'],\
     #                 np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)+np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
     #                 np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)-np.std(OUTPUT['CROSS_CORRELS'], axis=-1), lw=0, color=Grey)
-        # pCC = 
+
     # # pCC = np.log(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))/np.log(10)
     # ax.set_xscale('log')
     # ax.set_title('wavelet packets in bands: [$f/w$, $f\cdot w$]', fontsize=FONTSIZE)
@@ -286,7 +287,45 @@ def plot_test_different_smoothing(args):
     #                  label='cc $V_m$-pLFP \n (n='+str(OUTPUT['CROSS_CORRELS'].shape[-1])+')')
     return [fig_optimum]
 
-    
+
+###############################################################
+##          Show full-recording                              ##
+###############################################################
+
+def show_cell(args):
+    DATASET = get_full_dataset(args, include_only_chosen=False)
+    args.subsampling_period = 5e-3
+    FIGS = []
+    # plot full dataset
+    i, cell = args.cell_index, DATASET[args.cell_index]
+    fig, AX = plt.subplots(2*len(cell['files']),
+                           figsize=(9,3.*len(cell['files'])))
+    plt.subplots_adjust(hspace=.6, top=.92, bottom=.12)
+    fig.suptitle(cell['info']+' '+cell['cell']+100*' ')
+    # if len(cell['files'])==1: AX = [AX]
+    for ax1, ax2, fn in zip(AX[::2], AX[1::2], cell['files']):
+        print(fn)
+        data = load_data(fn, args,\
+                         chosen_window_only=False)
+        ax1.plot(data['sbsmpl_t'], data['sbsmpl_Vm'], 'k-', lw=.3)
+        ax1.plot([0, 5], [-40, -40], lw=4, color='gray')
+        ax1.annotate('5s', (2, -35))
+        set_plot(ax1, ylabel='Vm (mV)',
+                 xlim=[data['t'][0], data['t'][-1]],
+                 ylim=[data['Vm'].min(), data['Vm'].max()])
+        ax2.plot(data['sbsmpl_t'], data['sbsmpl_Extra'], 'k-', lw=.3)
+        set_plot(ax2, ylabel='$V_{ext}$ (mV)',
+                 xlim=[data['t'][0], data['t'][-1]])
+        with open(fn.replace('abf', 'json')) as f:
+            props = json.load(f)
+        ax1.fill_between([float(props['t0']), float(props['t1'])],
+                        ax1.get_ylim()[0]*np.ones(2),
+                        ax1.get_ylim()[1]*np.ones(2),
+                        color='r', alpha=.1)
+        ax1.set_title(data['name'])
+    return [fig]
+        
+
 if __name__=='__main__':
     
     import argparse
@@ -311,6 +350,8 @@ if __name__=='__main__':
     parser.add_argument('-ptds', "--plot_test_different_smoothing", help="",action="store_true")
     parser.add_argument('-smi', '--smoothing_min', type=float, default=5e-3)    
     parser.add_argument('-sma', '--smoothing_max', type=float, default=0.15)    
+    #### SHOW A CELL
+    parser.add_argument('-sc', "--show_cell", help="",action="store_true")
     
     parser.add_argument("--parallelize",
                         help="parallelize the computation using multiprocessing",
@@ -341,6 +382,8 @@ if __name__=='__main__':
         test_different_smoothing(args)
     elif args.plot_test_different_smoothing:
         FIGS = plot_test_different_smoothing(args)
+    elif args.show_cell:
+        FIGS = show_cell(args)
 
     if len(FIGS)>0:
         show()
