@@ -195,8 +195,11 @@ def test_different_smoothing(args):
     
     T_SMOOTH = np.concatenate([\
                                [0],
-                               np.logspace(np.log(args.smoothing_min)/np.log(10),
-                                           np.log(args.smoothing_max)/np.log(10),
+                               # np.logspace(np.log(args.smoothing_min)/np.log(10),
+                               #             np.log(args.smoothing_max)/np.log(10),
+                               #             args.discretization)
+                               np.linspace(args.smoothing_min,
+                                           args.smoothing_max,
                                            args.discretization)
                                ])
 
@@ -261,16 +264,17 @@ def plot_test_different_smoothing(args):
 
     OUTPUT = dict(np.load(args.datafile_input))
     print(OUTPUT)
-    # pCC = np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)
-    # # pCC = np.log(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))/np.log(10)
     
-    # fig_optimum, ax = figure(figsize=(.3, .16), right=.7, top=.9, bottom=1.2, left=.9)
-    # p = plt.contourf(OUTPUT['BAND_LENGTH_FACTOR'],
-    #                  OUTPUT['CENTER_FREQUENCIES'],
-    #                  pCC,
-    #                  levels=np.linspace(pCC.min(),pCC.max(),30),
-    #                  cmap=viridis)
-    # ax.set_yscale('log')
+    fig_optimum, ax = figure(figsize=(.3, .16), right=.7, top=.9, bottom=1.2, left=.9)
+    # for i in range(OUTPUT['CROSS_CORRELS'].shape[1]):
+    #     ax.plot(OUTPUT['T_SMOOTH'], OUTPUT['CROSS_CORRELS'][:,i])
+    ax.plot(OUTPUT['T_SMOOTH'], np.mean(OUTPUT['CROSS_CORRELS'], axis=-1), color='k')
+    # ax.fill_between(OUTPUT['T_SMOOTH'],\
+    #                 np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)+np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
+    #                 np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)-np.std(OUTPUT['CROSS_CORRELS'], axis=-1), lw=0, color=Grey)
+        # pCC = 
+    # # pCC = np.log(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))/np.log(10)
+    # ax.set_xscale('log')
     # ax.set_title('wavelet packets in bands: [$f/w$, $f\cdot w$]', fontsize=FONTSIZE)
     # set_plot(ax, xlabel=' $w$, width factor\n for freq. band extent',
     #          ylabel=' $f$, center freq. (Hz)    ',
@@ -280,7 +284,7 @@ def plot_test_different_smoothing(args):
     #                  acb, viridis,
     #                  color_discretization=30,
     #                  label='cc $V_m$-pLFP \n (n='+str(OUTPUT['CROSS_CORRELS'].shape[-1])+')')
-    # return [fig_optimum]
+    return [fig_optimum]
 
     
 if __name__=='__main__':
@@ -306,7 +310,7 @@ if __name__=='__main__':
     parser.add_argument('-tds', "--test_different_smoothing", help="",action="store_true")
     parser.add_argument('-ptds', "--plot_test_different_smoothing", help="",action="store_true")
     parser.add_argument('-smi', '--smoothing_min', type=float, default=5e-3)    
-    parser.add_argument('-sma', '--smoothing_max', type=float, default=0.5)    
+    parser.add_argument('-sma', '--smoothing_max', type=float, default=0.15)    
     
     parser.add_argument("--parallelize",
                         help="parallelize the computation using multiprocessing",
