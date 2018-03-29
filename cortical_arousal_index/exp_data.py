@@ -270,6 +270,9 @@ def plot_test_different_smoothing(args):
     for i in range(OUTPUT['CROSS_CORRELS'].shape[1]):
         ax.plot(OUTPUT['T_SMOOTH'], OUTPUT['CROSS_CORRELS'][:,i])
         print(DATASET[i]['files'][0], np.mean(OUTPUT['CROSS_CORRELS'][:,i]))
+
+    i0 = np.argmax(OUTPUT['CROSS_CORRELS'][:,i])
+    
     # ax.plot(OUTPUT['T_SMOOTH'], np.mean(OUTPUT['CROSS_CORRELS'], axis=-1), color='k')
     # ax.fill_between(OUTPUT['T_SMOOTH'],\
     #                 np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)+np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
@@ -326,6 +329,123 @@ def show_cell(args):
         ax1.set_title(data['name'])
     return [fig]
         
+###############################################################
+##             COMPUTE FINAL pLFP                            ##
+###############################################################
+
+def compute_final_pLFP(args):
+
+    #####################################################
+    ## Get frequency parameters from the analysis
+    #####################################################
+    OUTPUT = dict(np.load('data/final_wvl_scan.npz'))
+    i0, j0 = np.unravel_index(np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1), axis=None),
+                              OUTPUT['CROSS_CORRELS'].shape[:2])
+    f0, w0 = OUTPUT['CENTER_FREQUENCIES'][i0], OUTPUT['BAND_LENGTH_FACTOR'][j0]
+    # Smoothing time constant
+    OUTPUT = dict(np.load('data/final_smooth.npz'))
+    Ts = OUTPUT['T_SMOOTH'][np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))]
+    #####################################################
+
+    DATASET = get_full_dataset(args)
+    DATA = []
+    
+    if args.parallelize:
+        PROCESSES = []
+        # Define an output queue
+        output = mp.Queue()
+        
+    def run_func(icell, output):
+        print('=================================================')
+        print('running cell', icell, '[...]')
+        functions.preprocess_LFP(DATA[icell],
+                                 freqs=np.linspace(f0/w0, f0*w0, args.wavelet_number),
+                                 smoothing=Ts, new_dt=DATA[icell]['dt'])
+        cc = np.abs(np.corrcoef(DATA[icell]['new_Vm'], DATA[icell]['pLFP']))[0,1]
+        np.savez(DATASET[icell]['files'][0].replace('.abf', '_pLFP.npz'),
+                 **{'t':DATA[icell]['new_t'],
+                    'Vm':DATA[icell]['new_Vm'],
+                    'Extra':DATA[icell]['new_Extra'],
+                    'pLFP':DATA[icell]['pLFP'],
+                    'cc':cc})
+        print('=================================================')
+            
+    for icell, cell in enumerate(DATASET):
+        print('Cell '+str(icell+1)+' :', cell['files'][0])
+        DATA.append(load_data(cell['files'][0], args))
+        if args.parallelize:
+            PROCESSES.append(mp.Process(target=run_func, args=(icell, output)))
+        else:
+            run_func(icell, 0)
+
+    if args.parallelize:
+        # Run processes
+        for p in PROCESSES:
+            p.start()
+        # # Exit the completed processes
+        for p in PROCESSES:
+            p.join()
+    
+    
+###############################################################
+##          Show Sample with pLFP                            ##
+###############################################################
+
+def show_sample_with_pLFP(args):
+    DATASET = get_full_dataset(args, include_only_chosen=False)
+    args.subsampling_period = 5e-3
+    FIGS = []
+    # plot full dataset
+    i, cell = args.cell_index, DATASET[args.cell_index]
+
+    data = np.load(cell['files'][0].replace('.abf', '_pLFP.npz'))
+    
+    fig, AX = plt.subplots(2*len(cell['files']),
+                           figsize=(9,2.*len(cell['files'])))
+    plt.subplots_adjust(hspace=.2, top=.85, bottom=.2)
+    fig.suptitle(cell['info']+' '+cell['cell']+100*' ', fontsize=FONTSIZE)
+
+    V2 = data['Vm']
+    V2[data['Vm']>=args.spike_threshold] = args.spike_threshold
+    
+    for ax1, ax2, fn in zip(AX[::2], AX[1::2], cell['files']):
+        cond = (data['t']>args.t1) & (data['t']<args.t2)
+        ax1.plot(data['t'][cond],
+                 V2[cond], 'k-', lw=.3)
+        ax1.plot([0, 5], [-40, -40], 'k-', lw=1)
+        ax1.annotate('5s', (2, -35), fontsize=FONTSIZE)
+        set_plot(ax1, ['left'], ylabel='Vm (mV)',
+                 xlim=[data['t'][cond][0], data['t'][cond][-1]])
+        ax2.plot(data['t'][cond], data['pLFP'][cond], 'k-', lw=.3)
+        set_plot(ax2, ['left'], ylabel='pLFP ($\mu$V)',
+                 xlim=[data['t'][cond][0], data['t'][cond][-1]])
+        ax1.set_title('Vm-pLFP cc='+str(np.round(data['cc'],3)), fontsize=FONTSIZE)
+    return [fig]
+
+###############################################################
+##          Compare Correl Extra and pLFP                            ##
+###############################################################
+
+def compare_correl_LFP_pLFP(args):
+    DATASET = get_full_dataset(args)
+    args.subsampling_period = 5e-3
+    FIGS = []
+    # plot full dataset
+    fig, ax = figure()
+    mean1, mean0 = 0, 0
+    for i, cell in enumerate(DATASET):
+
+        data = np.load(cell['files'][0].replace('.abf', '_pLFP.npz'))
+        cc0 = np.abs(np.corrcoef(data['Vm'], data['Extra']))[0,1]
+        cc1 = np.abs(np.corrcoef(data['Vm'], data['pLFP']))[0,1]
+        ax.plot([0, 1], [cc0, cc1])
+        mean1+=cc1/len(DATASET)
+        mean0+=cc0/len(DATASET)
+    ax.bar([0], [mean0], width=0.4)
+    ax.bar([1], [mean1], width=0.4)
+
+    return [fig]
+
 
 if __name__=='__main__':
     
@@ -353,7 +473,14 @@ if __name__=='__main__':
     parser.add_argument('-sma', '--smoothing_max', type=float, default=0.15)    
     #### SHOW A CELL
     parser.add_argument('-sc', "--show_cell", help="",action="store_true")
-    
+    #### COPMUTE FINAL pLFP
+    parser.add_argument('-cfp', "--compute_final_pLFP", help="",action="store_true")
+    #### show_sample_with_pLFP
+    parser.add_argument('-sswp', "--show_sample_with_pLFP", help="",action="store_true")
+    parser.add_argument('--t1', type=float,default=-np.inf)    
+    parser.add_argument('--t2', type=float,default=np.inf)    
+    #### compare_correl_LFP_pLFP
+    parser.add_argument('-cclp', "--compare_correl_LFP_pLFP", help="",action="store_true")
     parser.add_argument("--parallelize",
                         help="parallelize the computation using multiprocessing",
                         action="store_true")
@@ -368,6 +495,7 @@ if __name__=='__main__':
                         type=int, default=0)    
     # parameters of the analysis
     parser.add_argument('--subsampling_period', type=float,default=5e-4)    
+    parser.add_argument('--spike_threshold', type=float,default=-35.)    
 
     args = parser.parse_args()
 
@@ -385,7 +513,13 @@ if __name__=='__main__':
         FIGS = plot_test_different_smoothing(args)
     elif args.show_cell:
         FIGS = show_cell(args)
-
+    elif args.compute_final_pLFP:
+        compute_final_pLFP(args)
+    elif args.show_sample_with_pLFP:
+        FIGS = show_sample_with_pLFP(args)
+    elif compare_correl_LFP_pLFP:
+        FIGS = compare_correl_LFP_pLFP(args)
+        
     if len(FIGS)>0:
         show()
     for i, fig in enumerate(FIGS):

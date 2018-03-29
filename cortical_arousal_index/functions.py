@@ -81,7 +81,7 @@ def preprocess_LFP(data,
 
     # taking the mean power over the frequency content considered
     W2 = np.abs(data['W']).mean(axis=0)
-    isubsmpl = int(round(new_dt/dt))
+    isubsmpl = int(new_dt/dt)
 
     # then smoothing and subsampling
     if smoothing>0:
@@ -97,7 +97,7 @@ def preprocess_LFP(data,
     if pLFP_unit=='$\mu$V':
         data['pLFP'] *= 1e3
         
-    data['new_t'] = np.arange(len(data['pLFP']))*new_dt+data['t'][0]
+        data['new_t'] = np.arange(len(data['pLFP']))*new_dt+data['t'][0]
     data['new_indices'] = np.arange(len(data['pLFP']))*isubsmpl # indices of data['t'] corresponding to data['new_t']
     data['new_Vm'] = data['Vm'].flatten()[data['new_indices']] # subsampled Vm corresponding to the
     data['new_Extra'] = data['Extra'].flatten()[data['new_indices']]
