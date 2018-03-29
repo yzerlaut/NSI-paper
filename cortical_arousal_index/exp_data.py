@@ -53,7 +53,8 @@ def show_dataset(directory):
 def load_data(fn, args,
               chosen_window_only=True):
 
-    with open(fn.replace('abf', 'json')) as f: props = json.load(f)
+    s1, s2 = 'sparse_vs_balanced/sparse_vs_balanced', 'cortical_arousal_index/cortical_arousal_index'
+    with open(fn.replace(s1, s2).replace('abf', 'json')) as f: props = json.load(f)
     
     if chosen_window_only:
         t0, t1 = np.float(props['t0']), np.float(props['t1'])
