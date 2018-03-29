@@ -89,10 +89,10 @@ def test_different_wavelets(args):
     
     CENTER_FREQUENCIES = np.logspace(np.log(args.center_wavelet_freq_min)/np.log(10),
                                      np.log(args.center_wavelet_freq_max)/np.log(10),
-                                     args.wavelet_discretization)
+                                     args.discretization)
     BAND_LENGTH_FACTOR = np.linspace(args.factor_wavelet_freq_min,
                                      args.factor_wavelet_freq_max,
-                                     args.wavelet_discretization)
+                                     args.discretization)
     
 
     DATASET = get_full_dataset(args)
@@ -152,7 +152,7 @@ def test_different_wavelets(args):
 
 def plot_test_different_wavelets(args):
 
-    OUTPUT = dict(np.load('data/test_different_wavelet_analysis.npz'))
+    OUTPUT = dict(np.load(args.datafile_input))
 
     print('frequencies :', OUTPUT['CENTER_FREQUENCIES'])
     print('length :', OUTPUT['BAND_LENGTH_FACTOR'])
@@ -162,6 +162,10 @@ def plot_test_different_wavelets(args):
     i0, j0 = np.unravel_index(np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1), axis=None),
                               pCC.shape)
     f0, w0 = OUTPUT['CENTER_FREQUENCIES'][i0], OUTPUT['BAND_LENGTH_FACTOR'][j0]
+    
+    print('== OPTIMIZATION RESULTS == ')
+    print(f0, w0)
+    print(f0/w0, f0*w0)
     
     fig_optimum, ax = figure(figsize=(.3, .16), right=.7, top=.9, bottom=1.2, left=.9)
     p = plt.contourf(OUTPUT['BAND_LENGTH_FACTOR'],
@@ -193,71 +197,90 @@ def test_different_smoothing(args):
                                [0],
                                np.logspace(np.log(args.smoothing_min)/np.log(10),
                                            np.log(args.smoothing_max)/np.log(10),
-                                           args.smoothing_discretization)
+                                           args.discretization)
                                ])
 
     ## NOEED TO GRAB THE OPTIMAL FREQUENCY !
-    OUTPUT = dict(np.load('data/test_different_wavelet_analysis.npz'))
+    OUTPUT = dict(np.load(args.datafile_input))
     i0, j0 = np.unravel_index(np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1), axis=None),
-                              pCC.shape)
+                              OUTPUT['CROSS_CORRELS'].shape[:2])
     f0, w0 = OUTPUT['CENTER_FREQUENCIES'][i0], OUTPUT['BAND_LENGTH_FACTOR'][j0]
-
     
     DATASET = get_full_dataset(args)
     DATA = []
-    print('================================')
-    print(' loading files [...]')
-    for i, cell in enumerate(DATASET):
-        print('Cell '+str(i+1)+' :', cell['files'][0])
-        DATA.append(load_data(cell['files'][0], args))
-            
     CROSS_CORRELS = np.zeros((len(T_SMOOTH), len(DATASET)))
     
-    def run_func(it, icell, CROSS_CORRELS):
-        Ts = Tsmooth[it]
-        print('running ', it, 'on cell', icell, '[...]')
-        functions.preprocess_LFP(DATA[icell],
-                                 freqs=np.linspace(cf0/blf0, cf0*blf0, args.wavelet_number),
-                                 smoothing=Ts) # HERE SMOOTHING !!
-        cc = np.abs(np.corrcoef(DATA[icell]['new_Vm'], DATA[icell]['pLFP']))[0,1]
-        CROSS_CORRELS[icf, ibl, icell] = cc
+    if args.parallelize:
+        PROCESSES = []
+        # Define an output queue
+        output = mp.Queue()
+        
+    def run_func(icell, output):
+        print('=================================================')
+        print('running cell', icell, '[...]')
+        CROSS_CORRELS0 = np.zeros(len(T_SMOOTH))
+        for it in range(len(T_SMOOTH)):
+            print('running ', T_SMOOTH[it], 'on cell', icell, '[...]')
+            functions.preprocess_LFP(DATA[icell],
+                                     freqs=np.linspace(f0/w0, f0*w0, args.wavelet_number),
+                                     smoothing=T_SMOOTH[it]) # SMOOTHING !!
+            cc = np.abs(np.corrcoef(DATA[icell]['new_Vm'], DATA[icell]['pLFP']))[0,1]
+            CROSS_CORRELS0[it] = cc
+        np.save(DATASET[icell]['files'][0].replace('.abf', '_wavelet_scan.npy'),
+                CROSS_CORRELS0)
+        print('=================================================')
+            
+    for icell, cell in enumerate(DATASET):
+        print('Cell '+str(icell+1)+' :', cell['files'][0])
+        DATA.append(load_data(cell['files'][0], args))
+        
+        if args.parallelize:
+            PROCESSES.append(mp.Process(target=run_func, args=(icell, output)))
+        else:
+            run_func(icell, 0)
 
-    for icell, icf, ibl in product(range(len(DATASET)),\
-                                   range(len(CENTER_FREQUENCIES)),
-                                   range(len(BAND_LENGTH_FACTOR))):
-        run_func(icf, ibl, icell, CROSS_CORRELS)
-
+    if args.parallelize:
+        # Run processes
+        for p in PROCESSES:
+            p.start()
+        # # Exit the completed processes
+        for p in PROCESSES:
+            p.join()
+    
+    for i, cell in enumerate(DATASET):
+        CROSS_CORRELS[:, i] = np.load(cell['files'][0].replace('.abf', '_wavelet_scan.npy'))
+                
     OUTPUT = {'Params':args,
-              'CENTER_FREQUENCIES' : CENTER_FREQUENCIES,
-              'BAND_LENGTH_FACTOR' : BAND_LENGTH_FACTOR,
+              'T_SMOOTH' : T_SMOOTH,
               'CROSS_CORRELS' : CROSS_CORRELS}
 
     np.savez(args.datafile_output, **OUTPUT)
+    
 
 def plot_test_different_smoothing(args):
 
-    OUTPUT = dict(np.load('data/test_different_wavelet_analysis.npz'))
-
-    pCC = np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)
-    # pCC = np.log(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))/np.log(10)
+    OUTPUT = dict(np.load(args.datafile_input))
+    print(OUTPUT)
+    # pCC = np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)
+    # # pCC = np.log(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))/np.log(10)
     
-    fig_optimum, ax = figure(figsize=(.3, .16), right=.7, top=.9, bottom=1.2, left=.9)
-    p = plt.contourf(OUTPUT['BAND_LENGTH_FACTOR'],
-                     OUTPUT['CENTER_FREQUENCIES'],
-                     pCC,
-                     levels=np.linspace(pCC.min(),pCC.max(),30),
-                     cmap=viridis)
-    ax.set_yscale('log')
-    ax.set_title('wavelet packets in bands: [$f/w$, $f\cdot w$]', fontsize=FONTSIZE)
-    set_plot(ax, xlabel=' $w$, width factor\n for freq. band extent',
-             ylabel=' $f$, center freq. (Hz)    ',
-             yticks=[2, 20, 200], yticks_labels=['2', '20', '200'], xticks=np.arange(1, 5))
-    acb = plt.axes([.71,.4,.02,.4])
-    build_bar_legend(np.unique(np.round(np.linspace(pCC.min(),pCC.max(),10),1)),
-                     acb, viridis,
-                     color_discretization=30,
-                     label='cc $V_m$-pLFP \n (n='+str(OUTPUT['CROSS_CORRELS'].shape[-1])+')')
-    return [fig_optimum]
+    # fig_optimum, ax = figure(figsize=(.3, .16), right=.7, top=.9, bottom=1.2, left=.9)
+    # p = plt.contourf(OUTPUT['BAND_LENGTH_FACTOR'],
+    #                  OUTPUT['CENTER_FREQUENCIES'],
+    #                  pCC,
+    #                  levels=np.linspace(pCC.min(),pCC.max(),30),
+    #                  cmap=viridis)
+    # ax.set_yscale('log')
+    # ax.set_title('wavelet packets in bands: [$f/w$, $f\cdot w$]', fontsize=FONTSIZE)
+    # set_plot(ax, xlabel=' $w$, width factor\n for freq. band extent',
+    #          ylabel=' $f$, center freq. (Hz)    ',
+    #          yticks=[2, 20, 200], yticks_labels=['2', '20', '200'], xticks=np.arange(1, 5))
+    # acb = plt.axes([.71,.4,.02,.4])
+    # build_bar_legend(np.unique(np.round(np.linspace(pCC.min(),pCC.max(),10),1)),
+    #                  acb, viridis,
+    #                  color_discretization=30,
+    #                  label='cc $V_m$-pLFP \n (n='+str(OUTPUT['CROSS_CORRELS'].shape[-1])+')')
+    # return [fig_optimum]
 
     
 if __name__=='__main__':
@@ -272,16 +295,17 @@ if __name__=='__main__':
     parser.add_argument('-tdw', "--test_different_wavelets", help="",action="store_true")
     parser.add_argument('-ptdw', "--plot_test_different_wavelets", help="",action="store_true")
     parser.add_argument('--wavelet_number', type=int, default=5)    
-    parser.add_argument('--wavelet_discretization', type=int, default=2)    
+    parser.add_argument('--discretization', type=int, default=2)    
     parser.add_argument('-cfmi', '--center_wavelet_freq_min', type=float, default=1)    
     parser.add_argument('-cfma', '--center_wavelet_freq_max', type=float, default=1000)    
     parser.add_argument('-ffmi', '--factor_wavelet_freq_min', type=float, default=1.01)    
     parser.add_argument('-ffma', '--factor_wavelet_freq_max', type=float, default=4.)    
     parser.add_argument('-f', '--datafile_output', default='data/data.npz')    
+    parser.add_argument('-if', '--datafile_input', default='data/data.npz')    
     #### TEST DIFFERENT SMOOTHING
     parser.add_argument('-tds', "--test_different_smoothing", help="",action="store_true")
     parser.add_argument('-ptds', "--plot_test_different_smoothing", help="",action="store_true")
-    parser.add_argument('-smi', '--smoothing_min', type=float, default=0.)    
+    parser.add_argument('-smi', '--smoothing_min', type=float, default=5e-3)    
     parser.add_argument('-sma', '--smoothing_max', type=float, default=0.5)    
     
     parser.add_argument("--parallelize",
@@ -309,6 +333,10 @@ if __name__=='__main__':
         test_different_wavelets(args)
     elif args.plot_test_different_wavelets:
         FIGS = plot_test_different_wavelets(args)
+    elif args.test_different_smoothing:
+        test_different_smoothing(args)
+    elif args.plot_test_different_smoothing:
+        FIGS = plot_test_different_smoothing(args)
 
     if len(FIGS)>0:
         show()
