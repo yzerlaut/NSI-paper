@@ -12,6 +12,7 @@ import functions
 
 curdir=os.path.abspath(__file__).replace(os.path.basename(__file__),'')
 datadir= '../../sparse_vs_balanced'+os.path.sep+'sparse_vs_balanced'+os.path.sep
+datadir2= '../../cortical_arousal_index'+os.path.sep+'cortical_arousal_index'+os.path.sep
 
 ###############################################################
 ##          LOAD DATASETS #####################################
@@ -26,7 +27,7 @@ def get_one_dataset(directory, info='', include_only_chosen=True):
         for f in files:
             if f.endswith('.abf'):
                 with open(directory+os.path.sep+cell+os.path.sep+\
-                          f.replace('abf', 'json')) as ff: props = json.load(ff)
+                          f.replace('abf', 'json').replace(datadir, datadir2)) as ff: props = json.load(ff)
                 if props['t1']!='0' or not include_only_chosen:
                     FILES.append(f)
         if len(FILES)>0:
@@ -53,9 +54,8 @@ def show_dataset(directory):
 def load_data(fn, args,
               chosen_window_only=True):
 
-    s1, s2 = 'sparse_vs_balanced/sparse_vs_balanced', 'cortical_arousal_index/cortical_arousal_index'
-    with open(fn.replace(s1, s2).replace('abf', 'json')) as f: props = json.load(f)
-    
+    with open(fn.replace(datadir, datadir2).replace('abf', 'json')) as f: props = json.load(f)
+
     if chosen_window_only:
         t0, t1 = np.float(props['t0']), np.float(props['t1'])
     else:
@@ -320,7 +320,7 @@ def show_cell(args):
         ax2.plot(data['sbsmpl_t'], data['sbsmpl_Extra'], 'k-', lw=.3)
         set_plot(ax2, ylabel='$V_{ext}$ (mV)',
                  xlim=[data['t'][0], data['t'][-1]])
-        with open(fn.replace('abf', 'json')) as f:
+        with open(fn.replace(datadir, datadir2).replace('abf', 'json')) as f:
             props = json.load(f)
         ax1.fill_between([float(props['t0']), float(props['t1'])],
                         ax1.get_ylim()[0]*np.ones(2),
@@ -517,8 +517,10 @@ if __name__=='__main__':
         compute_final_pLFP(args)
     elif args.show_sample_with_pLFP:
         FIGS = show_sample_with_pLFP(args)
-    elif compare_correl_LFP_pLFP:
+    elif args.compare_correl_LFP_pLFP:
         FIGS = compare_correl_LFP_pLFP(args)
+    else:
+        pass
         
     if len(FIGS)>0:
         show()
