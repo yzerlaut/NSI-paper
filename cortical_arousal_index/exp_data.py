@@ -12,7 +12,8 @@ import functions
 
 curdir=os.path.abspath(__file__).replace(os.path.basename(__file__),'')
 datadir= '../../sparse_vs_balanced'+os.path.sep+'sparse_vs_balanced'+os.path.sep
-datadir2= '../../cortical_arousal_index'+os.path.sep+'cortical_arousal_index'+os.path.sep
+s1 = 'sparse_vs_balanced'+os.path.sep+'sparse_vs_balanced'
+s2 = 'cortical_arousal_index'+os.path.sep+'cortical_arousal_index'
 
 ###############################################################
 ##          LOAD DATASETS #####################################
@@ -27,7 +28,7 @@ def get_one_dataset(directory, info='', include_only_chosen=True):
         for f in files:
             if f.endswith('.abf'):
                 with open(directory+os.path.sep+cell+os.path.sep+\
-                          f.replace('abf', 'json').replace(datadir, datadir2)) as ff: props = json.load(ff)
+                          f.replace('abf', 'json').replace(s1, s2)) as ff: props = json.load(ff)
                 if props['t1']!='0' or not include_only_chosen:
                     FILES.append(f)
         if len(FILES)>0:
@@ -54,8 +55,8 @@ def show_dataset(directory):
 def load_data(fn, args,
               chosen_window_only=True):
 
-    with open(fn.replace(datadir, datadir2).replace('abf', 'json')) as f: props = json.load(f)
-
+    with open(fn.replace(s1, s2).replace('abf', 'json')) as f: props = json.load(f)
+    
     if chosen_window_only:
         t0, t1 = np.float(props['t0']), np.float(props['t1'])
     else:
@@ -267,13 +268,21 @@ def plot_test_different_smoothing(args):
     DATASET = get_full_dataset(args, include_only_chosen=False)
     
     fig_optimum, ax = figure(figsize=(.3, .16), right=.7, top=.9, bottom=1.2, left=.9)
-    for i in range(OUTPUT['CROSS_CORRELS'].shape[1]):
-        ax.plot(OUTPUT['T_SMOOTH'], OUTPUT['CROSS_CORRELS'][:,i])
-        print(DATASET[i]['files'][0], np.mean(OUTPUT['CROSS_CORRELS'][:,i]))
+    # for i in range(OUTPUT['CROSS_CORRELS'].shape[1]):
+    #     ax.plot(OUTPUT['T_SMOOTH'], OUTPUT['CROSS_CORRELS'][:,i])
+    #     print(DATASET[i]['files'][0], np.mean(OUTPUT['CROSS_CORRELS'][:,i]))
 
-    i0 = np.argmax(OUTPUT['CROSS_CORRELS'][:,i])
     
-    # ax.plot(OUTPUT['T_SMOOTH'], np.mean(OUTPUT['CROSS_CORRELS'], axis=-1), color='k')
+    i0 = np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))
+
+    mean_Output = np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)[::2]
+    cond = np.argwhere(mean_Output[:-1]!=mean_Output[1:]).flatten()
+    
+    Tsmooth = OUTPUT['T_SMOOTH'][::2]
+    ax.plot(1e3*Tsmooth, mean_Output, color='k')
+    ax.scatter([1e3*OUTPUT['T_SMOOTH'][i0]], [np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)[i0]],
+               marker='o', color=Brown, facecolor='None')
+    
     # ax.fill_between(OUTPUT['T_SMOOTH'],\
     #                 np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)+np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
     #                 np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)-np.std(OUTPUT['CROSS_CORRELS'], axis=-1), lw=0, color=Grey)
@@ -281,9 +290,8 @@ def plot_test_different_smoothing(args):
     # # pCC = np.log(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))/np.log(10)
     # ax.set_xscale('log')
     # ax.set_title('wavelet packets in bands: [$f/w$, $f\cdot w$]', fontsize=FONTSIZE)
-    # set_plot(ax, xlabel=' $w$, width factor\n for freq. band extent',
-    #          ylabel=' $f$, center freq. (Hz)    ',
-    #          yticks=[2, 20, 200], yticks_labels=['2', '20', '200'], xticks=np.arange(1, 5))
+    set_plot(ax, xlabel=' $T_{smoothing}$ (ms)',
+             ylabel='cc $V_m$-pLFP')
     # acb = plt.axes([.71,.4,.02,.4])
     # build_bar_legend(np.unique(np.round(np.linspace(pCC.min(),pCC.max(),10),1)),
     #                  acb, viridis,
@@ -291,7 +299,17 @@ def plot_test_different_smoothing(args):
     #                  label='cc $V_m$-pLFP \n (n='+str(OUTPUT['CROSS_CORRELS'].shape[-1])+')')
     return [fig_optimum]
 
+def get_pLFP_parameters_from_scan(datafile1='data/final_smooth.npz',
+                                  datafile2='data/final_smooth.npz'):
+    
+    OUTPUT = dict(np.load(datafile1))
+    pCC = np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)
+    i0, j0 = np.unravel_index(np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1), axis=None),
+                              pCC.shape)
+    f0, w0 = OUTPUT['CENTER_FREQUENCIES'][i0], OUTPUT['BAND_LENGTH_FACTOR'][j0]
+    OUTPUT = dict(np.load(datafile2))
 
+    return f0, w0, T0
 ###############################################################
 ##          Show full-recording                              ##
 ###############################################################
@@ -320,7 +338,7 @@ def show_cell(args):
         ax2.plot(data['sbsmpl_t'], data['sbsmpl_Extra'], 'k-', lw=.3)
         set_plot(ax2, ylabel='$V_{ext}$ (mV)',
                  xlim=[data['t'][0], data['t'][-1]])
-        with open(fn.replace(datadir, datadir2).replace('abf', 'json')) as f:
+        with open(fn.replace(s1, s2).replace('abf', 'json')) as f:
             props = json.load(f)
         ax1.fill_between([float(props['t0']), float(props['t1'])],
                         ax1.get_ylim()[0]*np.ones(2),
