@@ -204,7 +204,7 @@ def test_different_smoothing(args):
                                            args.discretization)
                                ])
 
-    ## NOEED TO GRAB THE OPTIMAL FREQUENCY !
+    ## NEED TO GRAB THE OPTIMAL FREQUENCY !
     OUTPUT = dict(np.load(args.datafile_input))
     i0, j0 = np.unravel_index(np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1), axis=None),
                               OUTPUT['CROSS_CORRELS'].shape[:2])
