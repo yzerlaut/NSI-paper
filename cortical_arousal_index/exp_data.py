@@ -117,7 +117,7 @@ def test_different_wavelets(args):
             functions.preprocess_LFP(DATA[icell],
                                      freqs=np.linspace(cf/blf, cf*blf, args.wavelet_number),
                                      smoothing=0.) # HERE NO SMOOTHING YET !!
-            cc = np.abs(np.corrcoef(DATA[icell]['sbsmpl_Vm'], DATA[icell]['pLFP']))[0,1]
+            cc = np.abs(np.corrcoef(DATA[icell]['sbsmpl_Vm'].flatten(), DATA[icell]['pLFP'].flatten()))[0,1]
             CROSS_CORRELS0[icf, ibl] = cc
         np.save(DATASET[icell]['files'][0].replace('.abf', '_wavelet_scan.npy'),
                 CROSS_CORRELS0)
@@ -229,7 +229,7 @@ def test_different_smoothing(args):
                                      freqs=np.linspace(f0/w0, f0*w0, args.wavelet_number),
                                      new_dt = args.subsampling_period,
                                      smoothing=T_SMOOTH[it]) # SMOOTHING !!
-            cc = np.abs(np.corrcoef(DATA[icell]['sbsmpl_Vm'], DATA[icell]['pLFP']))[0,1]
+            cc = np.abs(np.corrcoef(DATA[icell]['sbsmpl_Vm'].flatten(), DATA[icell]['pLFP'].flatten()))[0,1]
             CROSS_CORRELS0[it] = cc
         np.save(DATASET[icell]['files'][0].replace('.abf', '_wavelet_scan.npy'),
                 CROSS_CORRELS0)
@@ -381,7 +381,7 @@ def compute_final_pLFP(args):
                                  freqs=np.linspace(f0/w0, f0*w0, args.wavelet_number),
                                  new_dt = args.subsampling_period,
                                  smoothing=Ts)
-        cc = np.abs(np.corrcoef(DATA[icell]['sbsmpl_Vm'], DATA[icell]['pLFP']))[0,1]
+        cc = np.abs(np.corrcoef(DATA[icell]['sbsmpl_Vm'].flatten(), DATA[icell]['pLFP'].flatten()))[0,1]
         np.savez(DATASET[icell]['files'][0].replace('.abf', '_pLFP.npz'),
                  **{'t':DATA[icell]['sbsmpl_t'],
                     'Vm':DATA[icell]['sbsmpl_Vm'],
@@ -456,8 +456,8 @@ def compare_correl_LFP_pLFP(args):
     for i, cell in enumerate(DATASET):
 
         data = np.load(cell['files'][0].replace('.abf', '_pLFP.npz'))
-        cc0 = np.abs(np.corrcoef(data['Vm'], data['Extra']))[0,1]
-        cc1 = np.abs(np.corrcoef(data['Vm'], data['pLFP']))[0,1]
+        cc0 = np.abs(np.corrcoef(data['Vm'].flatten(), data['Extra'].flatten()))[0,1]
+        cc1 = np.abs(np.corrcoef(data['Vm'].flatten(), data['pLFP'].flatten()))[0,1]
         ax.plot([0, 1], [cc0, cc1])
         mean1+=cc1/len(DATASET)
         mean0+=cc0/len(DATASET)
