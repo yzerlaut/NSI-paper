@@ -116,6 +116,7 @@ def test_different_wavelets(args):
             print('running ', icf, ibl, 'on cell', icell, '[...]')
             functions.preprocess_LFP(DATA[icell],
                                      freqs=np.linspace(cf/blf, cf*blf, args.wavelet_number),
+                                     new_dt=args.subsampling_period,
                                      smoothing=0.) # HERE NO SMOOTHING YET !!
             cc = np.abs(np.corrcoef(DATA[icell]['sbsmpl_Vm'].flatten(), DATA[icell]['pLFP'].flatten()))[0,1]
             CROSS_CORRELS0[icf, ibl] = cc
@@ -265,8 +266,6 @@ def plot_test_different_smoothing(args):
 
     OUTPUT = dict(np.load(args.datafile_input))
 
-    DATASET = get_full_dataset(args, include_only_chosen=False)
-    
     fig_optimum, [[ax, ax1]] = figure(figsize=(.5, .16),
                                       right=0.85, top=0.9, bottom=1.2, left=.6, wspace=1.8,
                                       axes=(1,2))
@@ -549,7 +548,7 @@ if __name__=='__main__':
     elif args.compare_correl_LFP_pLFP:
         FIGS = compare_correl_LFP_pLFP(args)
     else:
-        get_pLFP_parameters_from_scan()
+        pass
         
     if len(FIGS)>0:
         show()
