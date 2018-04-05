@@ -151,7 +151,7 @@ def test_different_wavelets(args):
     print(OUTPUT)
     np.savez(args.datafile_output, **OUTPUT)
 
-def plot_test_different_wavelets(args):
+def plot_test_different_wavelets(args, colormap=plasma):
 
     OUTPUT = dict(np.load(args.datafile_input))
 
@@ -173,7 +173,7 @@ def plot_test_different_wavelets(args):
                      OUTPUT['CENTER_FREQUENCIES'],
                      pCC,
                      levels=np.linspace(pCC.min(),pCC.max(),30),
-                     cmap=viridis)
+                     cmap=colormap)
     ax.scatter([w0], [f0], color=Brown, facecolor='None', label='($f_{opt}, w_{opt}$)')
     ax.set_yscale('log')
     ax.set_title('wavelet packets in bands: [$f/w$, $f\cdot w$]', fontsize=FONTSIZE)
@@ -183,7 +183,7 @@ def plot_test_different_wavelets(args):
     ax.legend(loc=(1.05, .8), prop={'size':'x-small'})
     acb = plt.axes([.71,.35,.02,.4])
     build_bar_legend(np.unique(np.round(np.linspace(pCC.min(),pCC.max(),10),1)),
-                     acb, viridis,
+                     acb, colormap,
                      color_discretization=30,
                      label='cc $V_m$-pLFP \n (n='+str(OUTPUT['CROSS_CORRELS'].shape[-1])+')')
     return [fig_optimum]
@@ -267,40 +267,43 @@ def plot_test_different_smoothing(args):
 
     DATASET = get_full_dataset(args, include_only_chosen=False)
     
-    fig_optimum, [[ax, ax1]] = figure(figsize=(.4, .13),
-                                      right=1., top=1., bottom=1.2, left=.7, wspace=1.3,
+    fig_optimum, [[ax, ax1]] = figure(figsize=(.5, .16),
+                                      right=0.85, top=0.9, bottom=1.2, left=.6, wspace=1.8,
                                       axes=(1,2))
     
     i0 = np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))
 
     mean_Output = np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)
-    # cond = np.argwhere(mean_Output[:-1]!=mean_Output[1:]).flatten()
     
-    Tsmooth = OUTPUT['T_SMOOTH']
-    ax.plot(1e3*Tsmooth, mean_Output, color='k', lw=2)
-    ax1.plot(1e3*Tsmooth, mean_Output, color='k', lw=2)
+    Tsmooth = 1e3*OUTPUT['T_SMOOTH']
+    ax.plot(Tsmooth, mean_Output, color='k', lw=2)
     ax.scatter([1e3*OUTPUT['T_SMOOTH'][i0]], [np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)[i0]],
                marker='o', color=Brown, facecolor='None')
-    ax1.fill_between(1e3*Tsmooth,\
+    ax.annotate('$T_{opt}$', (Tsmooth[i0]+4, ax.get_ylim()[0]), color=Brown, fontsize=FONTSIZE)
+    ax.plot(np.array([Tsmooth[i0], Tsmooth[i0]]),
+            [mean_Output[i0], ax.get_ylim()[0]], '--', color=Brown, lw=1)
+    
+    order = np.argsort(np.mean(OUTPUT['CROSS_CORRELS'], axis=0))
+    for i in range(len(order)):
+        ax1.plot(Tsmooth, OUTPUT['CROSS_CORRELS'][:,order[i]], color=viridis(i/(len(order)-1)))
+    ax1.plot(Tsmooth, mean_Output, '-', color='k', lw=0.5)
+    ax1.fill_between(Tsmooth,\
                      mean_Output+np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
                      mean_Output-np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
-                     lw=0, color=Grey)
-    for i in range(OUTPUT['CROSS_CORRELS'].shape[1]):
-        ax1.plot(1e3*Tsmooth, OUTPUT['CROSS_CORRELS'][:,i])
+                     lw=0, color='k', alpha=.2)
 
-    # # pCC = np.log(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))/np.log(10)
-    # ax.set_xscale('log')
-    # ax.set_title('wavelet packets in bands: [$f/w$, $f\cdot w$]', fontsize=FONTSIZE)
     set_plot(ax, xlabel=' $T_{smoothing}$ (ms)',
              ylabel='cc $V_m$-pLFP')
-    # acb = plt.axes([.71,.4,.02,.4])
-    # build_bar_legend(np.unique(np.round(np.linspace(pCC.min(),pCC.max(),10),1)),
-    #                  acb, viridis,
-    #                  color_discretization=30,
-    #                  label='cc $V_m$-pLFP \n (n='+str(OUTPUT['CROSS_CORRELS'].shape[-1])+')')
+    set_plot(ax1, xlabel=' $T_{smoothing}$ (ms)',
+             ylabel='cc $V_m$-pLFP')
+    acb = plt.axes([.86,.4,.02,.4])
+    cb = build_bar_legend(np.arange(len(order)),
+                          acb, viridis,
+                          no_ticks=True,
+                          label='cell index \n (n='+str(len(order))+'cells)')
     return [fig_optimum]
 
-def get_pLFP_parameters_from_scan(datafile1='data/final_smooth.npz',
+def get_pLFP_parameters_from_scan(datafile1='data/final_wvl_scan.npz',
                                   datafile2='data/final_smooth.npz'):
     
     OUTPUT = dict(np.load(datafile1))
@@ -309,8 +312,14 @@ def get_pLFP_parameters_from_scan(datafile1='data/final_smooth.npz',
                               pCC.shape)
     f0, w0 = OUTPUT['CENTER_FREQUENCIES'][i0], OUTPUT['BAND_LENGTH_FACTOR'][j0]
     OUTPUT = dict(np.load(datafile2))
+    i0 = np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))
+    T0 = OUTPUT['T_SMOOTH'][i0]
 
+    print('wavelet pack in band: [', round(f0/w0,1), ',', round(f0*w0,1), ']Hz')
+    print('with smoothing time constant ', round(1e3*T0,1), 'ms')
+    
     return f0, w0, T0
+
 ###############################################################
 ##          Show full-recording                              ##
 ###############################################################
@@ -540,7 +549,7 @@ if __name__=='__main__':
     elif args.compare_correl_LFP_pLFP:
         FIGS = compare_correl_LFP_pLFP(args)
     else:
-        pass
+        get_pLFP_parameters_from_scan()
         
     if len(FIGS)>0:
         show()
