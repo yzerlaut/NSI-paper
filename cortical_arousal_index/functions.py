@@ -57,23 +57,25 @@ def norm_constant_th(freq, dt, w0=6.):
 ########### Processing of the LFP ################
 ##################################################
 
-def gaussian_smoothing(Signal, idt_sbsmpl=10):
+def gaussian_smoothing(Signal, idt_sbsmpl=10.):
     """Gaussian smoothing of the data"""
     return gaussian_filter1d(Signal, idt_sbsmpl)
 
 def preprocess_LFP(data,
-                   freqs = np.linspace(50, 300, 5), debug=False,
-                   new_dt = 5e-3, smoothing=20e-3, pLFP_unit='$\mu$V'):
+                   freqs = np.linspace(50, 300, 5), 
+                   new_dt = 5e-3,
+                   smoothing=20e-3,
+                   pLFP_unit='$\mu$V'):
     """
     performs continuous wavelet transform
     """
 
-    if debug:
-        Extra_key = 'sbsmpl_Extra'
-        dt = data['sbsmpl_dt']
-    else:
-        Extra_key = 'Extra'
-        dt = data['dt']
+    # if debug:
+    #     Extra_key = 'sbsmpl_Extra'
+    #     dt = data['sbsmpl_dt']
+
+    Extra_key = 'Extra'
+    dt = data['dt']
     
     # performing wavelet transform
     data['W'] = my_cwt(data[Extra_key].flatten(), freqs, dt) 
@@ -96,11 +98,8 @@ def preprocess_LFP(data,
     
     if pLFP_unit=='$\mu$V':
         data['pLFP'] *= 1e3
-        
-        data['new_t'] = np.arange(len(data['pLFP']))*new_dt+data['t'][0]
-    data['new_indices'] = np.arange(len(data['pLFP']))*isubsmpl # indices of data['t'] corresponding to data['new_t']
-    data['new_Vm'] = data['Vm'].flatten()[data['new_indices']] # subsampled Vm corresponding to the
-    data['new_Extra'] = data['Extra'].flatten()[data['new_indices']]
+
     
-    data['new_dt'] = new_dt
     
+if __name__=='__main__':
+    print(gaussian_smoothing(np.linspace(0,100,50), 1.3)) # translating to integer values... so keep in mind

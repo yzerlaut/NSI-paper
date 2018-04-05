@@ -75,10 +75,9 @@ def load_data(fn, args,
         data['Vm'] += float(props['offset'])
     
     isubsampling = int(args.subsampling_period/data['dt'])
-    
-    data['sbsmpl_Vm'] = data['Vm'][::isubsampling]
-    data['sbsmpl_Extra'] = data['Extra'][::isubsampling]
-    data['sbsmpl_t'] = data['t'][::isubsampling]
+    data['sbsmpl_Vm'] = data['Vm'][::isubsampling][:-1]
+    data['sbsmpl_Extra'] = data['Extra'][::isubsampling][:-1]
+    data['sbsmpl_t'] = data['t'][::isubsampling][:-1]
     data['sbsmpl_dt'] = data['dt']*isubsampling
     
     return data
@@ -118,7 +117,7 @@ def test_different_wavelets(args):
             functions.preprocess_LFP(DATA[icell],
                                      freqs=np.linspace(cf/blf, cf*blf, args.wavelet_number),
                                      smoothing=0.) # HERE NO SMOOTHING YET !!
-            cc = np.abs(np.corrcoef(DATA[icell]['new_Vm'], DATA[icell]['pLFP']))[0,1]
+            cc = np.abs(np.corrcoef(DATA[icell]['sbsmpl_Vm'], DATA[icell]['pLFP']))[0,1]
             CROSS_CORRELS0[icf, ibl] = cc
         np.save(DATASET[icell]['files'][0].replace('.abf', '_wavelet_scan.npy'),
                 CROSS_CORRELS0)
@@ -228,8 +227,9 @@ def test_different_smoothing(args):
             print('running ', T_SMOOTH[it], 'on cell', icell, '[...]')
             functions.preprocess_LFP(DATA[icell],
                                      freqs=np.linspace(f0/w0, f0*w0, args.wavelet_number),
+                                     new_dt = args.subsampling_period,
                                      smoothing=T_SMOOTH[it]) # SMOOTHING !!
-            cc = np.abs(np.corrcoef(DATA[icell]['new_Vm'], DATA[icell]['pLFP']))[0,1]
+            cc = np.abs(np.corrcoef(DATA[icell]['sbsmpl_Vm'], DATA[icell]['pLFP']))[0,1]
             CROSS_CORRELS0[it] = cc
         np.save(DATASET[icell]['files'][0].replace('.abf', '_wavelet_scan.npy'),
                 CROSS_CORRELS0)
@@ -264,28 +264,29 @@ def test_different_smoothing(args):
 def plot_test_different_smoothing(args):
 
     OUTPUT = dict(np.load(args.datafile_input))
-    print(OUTPUT)
+
     DATASET = get_full_dataset(args, include_only_chosen=False)
     
-    fig_optimum, ax = figure(figsize=(.3, .16), right=.7, top=.9, bottom=1.2, left=.9)
-    # for i in range(OUTPUT['CROSS_CORRELS'].shape[1]):
-    #     ax.plot(OUTPUT['T_SMOOTH'], OUTPUT['CROSS_CORRELS'][:,i])
-    #     print(DATASET[i]['files'][0], np.mean(OUTPUT['CROSS_CORRELS'][:,i]))
-
+    fig_optimum, [[ax, ax1]] = figure(figsize=(.4, .13),
+                                      right=1., top=1., bottom=1.2, left=.7, wspace=1.3,
+                                      axes=(1,2))
     
     i0 = np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))
 
-    mean_Output = np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)[::2]
-    cond = np.argwhere(mean_Output[:-1]!=mean_Output[1:]).flatten()
+    mean_Output = np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)
+    # cond = np.argwhere(mean_Output[:-1]!=mean_Output[1:]).flatten()
     
-    Tsmooth = OUTPUT['T_SMOOTH'][::2]
-    ax.plot(1e3*Tsmooth, mean_Output, color='k')
+    Tsmooth = OUTPUT['T_SMOOTH']
+    ax.plot(1e3*Tsmooth, mean_Output, color='k', lw=2)
+    ax1.plot(1e3*Tsmooth, mean_Output, color='k', lw=2)
     ax.scatter([1e3*OUTPUT['T_SMOOTH'][i0]], [np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)[i0]],
                marker='o', color=Brown, facecolor='None')
-    
-    # ax.fill_between(OUTPUT['T_SMOOTH'],\
-    #                 np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)+np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
-    #                 np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)-np.std(OUTPUT['CROSS_CORRELS'], axis=-1), lw=0, color=Grey)
+    ax1.fill_between(1e3*Tsmooth,\
+                     mean_Output+np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
+                     mean_Output-np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
+                     lw=0, color=Grey)
+    for i in range(OUTPUT['CROSS_CORRELS'].shape[1]):
+        ax1.plot(1e3*Tsmooth, OUTPUT['CROSS_CORRELS'][:,i])
 
     # # pCC = np.log(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))/np.log(10)
     # ax.set_xscale('log')
@@ -378,12 +379,13 @@ def compute_final_pLFP(args):
         print('running cell', icell, '[...]')
         functions.preprocess_LFP(DATA[icell],
                                  freqs=np.linspace(f0/w0, f0*w0, args.wavelet_number),
-                                 smoothing=Ts, new_dt=DATA[icell]['dt'])
-        cc = np.abs(np.corrcoef(DATA[icell]['new_Vm'], DATA[icell]['pLFP']))[0,1]
+                                 new_dt = args.subsampling_period,
+                                 smoothing=Ts)
+        cc = np.abs(np.corrcoef(DATA[icell]['sbsmpl_Vm'], DATA[icell]['pLFP']))[0,1]
         np.savez(DATASET[icell]['files'][0].replace('.abf', '_pLFP.npz'),
-                 **{'t':DATA[icell]['new_t'],
-                    'Vm':DATA[icell]['new_Vm'],
-                    'Extra':DATA[icell]['new_Extra'],
+                 **{'t':DATA[icell]['sbsmpl_t'],
+                    'Vm':DATA[icell]['sbsmpl_Vm'],
+                    'Extra':DATA[icell]['sbsmpl_Extra'],
                     'pLFP':DATA[icell]['pLFP'],
                     'cc':cc})
         print('=================================================')
@@ -512,7 +514,7 @@ if __name__=='__main__':
     parser.add_argument('--file_index', help='0 means full data',
                         type=int, default=0)    
     # parameters of the analysis
-    parser.add_argument('--subsampling_period', type=float,default=5e-4)    
+    parser.add_argument('--subsampling_period', type=float,default=5e-3)    
     parser.add_argument('--spike_threshold', type=float,default=-35.)    
 
     args = parser.parse_args()
