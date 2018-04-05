@@ -310,8 +310,17 @@ def get_pLFP_parameters_from_scan(datafile1='data/final_wvl_scan.npz',
     i0, j0 = np.unravel_index(np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1), axis=None),
                               pCC.shape)
     f0, w0 = OUTPUT['CENTER_FREQUENCIES'][i0], OUTPUT['BAND_LENGTH_FACTOR'][j0]
+
+    
     OUTPUT = dict(np.load(datafile2))
-    i0 = np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))
+
+
+    NORM = np.zeros(OUTPUT['CROSS_CORRELS'].shape)
+    order = np.argsort(np.mean(OUTPUT['CROSS_CORRELS'], axis=0))
+    for i in range(len(order)):
+        NORM[:,order[i]] = (OUTPUT['CROSS_CORRELS'][:,order[i]]-OUTPUT['CROSS_CORRELS'][0,order[i]])/\
+            (OUTPUT['CROSS_CORRELS'][:,order[i]].max()-OUTPUT['CROSS_CORRELS'][0,order[i]])
+    i0 = np.argmax(np.mean(NORM, axis=-1))
     T0 = OUTPUT['T_SMOOTH'][i0]
 
     print('wavelet pack in band: [', round(f0/w0,1), ',', round(f0*w0,1), ']Hz')

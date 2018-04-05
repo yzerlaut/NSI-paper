@@ -64,7 +64,7 @@ def gaussian_smoothing(Signal, idt_sbsmpl=10.):
 def preprocess_LFP(data,
                    freqs = np.linspace(50, 300, 5), 
                    new_dt = 5e-3,
-                   smoothing=20e-3,
+                   smoothing=0e-3,
                    pLFP_unit='$\mu$V'):
     """
     performs continuous wavelet transform
