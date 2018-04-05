@@ -90,10 +90,10 @@ def preprocess_LFP(data,
         data['pLFP'] = gaussian_smoothing(\
                                           np.reshape(W2[:int(len(W2)/isubsmpl)*isubsmpl],
                                                      (int(len(W2)/isubsmpl),isubsmpl)).mean(axis=1),
-                                          int(smoothing/new_dt))
+                                          int(smoothing/new_dt)).flatten()
     else: # smoothing=0, means no smoothing, just subsampling
         data['pLFP'] = np.reshape(W2[:int(len(W2)/isubsmpl)*isubsmpl],
-                                  (int(len(W2)/isubsmpl),isubsmpl)).mean(axis=1)
+                                  (int(len(W2)/isubsmpl),isubsmpl)).mean(axis=1).flatten()
     data['pLFP_unit']=pLFP_unit
     
     if pLFP_unit=='$\mu$V':
