@@ -91,6 +91,7 @@ def load_data(fn, args,
         functions.compute_Network_State_Index(data,
                                               Tstate=args.Tstate,
                                               Var_criteria=args.Var_criteria,
+                                              alpha=args.alpha,
                                               T_sliding_mean=args.T_sliding_mean)
 
     
@@ -554,6 +555,7 @@ if __name__=='__main__':
     parser.add_argument('--Tstate', type=float, default=200e-3)
     parser.add_argument('--Var_criteria', type=float, default=2.)
     parser.add_argument('--T_sliding_mean', type=float, default=500e-3)
+    parser.add_argument('--alpha', type=float, default=2.)
     
     args = parser.parse_args()
 

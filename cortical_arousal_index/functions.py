@@ -110,6 +110,7 @@ def heaviside(x):
 def compute_Network_State_Index(data,
                                 freqs = np.linspace(2,10,20),
                                 Tstate=200e-3, Var_criteria=2,
+                                alpha=2.,
                                 T_sliding_mean=0.5):
     # sliding mean
     data['sliding_mean'] = gaussian_smoothing(data['pLFP'], int(T_sliding_mean/data['sbsmpl_dt']))
@@ -123,7 +124,7 @@ def compute_Network_State_Index(data,
     data['NSI']=np.zeros(len(data['sbsmpl_t']))
     
     # where rhythmicity is matched
-    X = (data['p0']+2*data['max_low_freqs_power'])-data['sliding_mean']
+    X = (data['p0']+alpha*data['max_low_freqs_power'])-data['sliding_mean']
     data['NSI'] = -2*data['max_low_freqs_power']*heaviside(X)+heaviside(-X)*(data['sliding_mean']-data['p0'])
     
     # validate states:
