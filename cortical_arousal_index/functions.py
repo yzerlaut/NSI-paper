@@ -65,6 +65,7 @@ def preprocess_LFP(data,
                    freqs = np.linspace(50, 300, 5), 
                    new_dt = 5e-3,
                    smoothing=0e-3,
+                   percentile_for_p0=0.01,                   
                    pLFP_unit='$\mu$V'):
     """
     performs continuous wavelet transform
@@ -99,6 +100,39 @@ def preprocess_LFP(data,
     if pLFP_unit=='$\mu$V':
         data['pLFP'] *= 1e3
 
+    # find p0
+    Hist, be = np.histogram(data['pLFP'], bins=int(1./percentile_for_p0))
+    data['p0']=be[1]
+
+def heaviside(x):
+    return (np.sign(x)+1)/2
+
+def compute_Network_State_Index(data,
+                                freqs = np.linspace(2,10,20),
+                                Tstate=200e-3, Var_criteria=2,
+                                T_sliding_mean=0.5):
+    # sliding mean
+    data['sliding_mean'] = gaussian_smoothing(data['pLFP'], int(T_sliding_mean/data['sbsmpl_dt']))
+
+    # low frequency power
+    data['low_freqs'] = freqs # storing the used-freq
+    data['W_low_freqs'] = my_cwt(data['pLFP'], freqs, data['sbsmpl_dt']) # wavelet transform
+    data['max_low_freqs_power'] = np.max(np.abs(data['W_low_freqs']), axis=0) # max of freq.
+    
+    
+    data['NSI']=np.zeros(len(data['sbsmpl_t']))
+    
+    # where rhythmicity is matched
+    X = (data['p0']+2*data['max_low_freqs_power'])-data['sliding_mean']
+    data['NSI'] = -2*data['max_low_freqs_power']*heaviside(X)+heaviside(-X)*(data['sliding_mean']-data['p0'])
+    
+    # validate states:
+    iTstate = int(Tstate/data['sbsmpl_dt'])
+    # validate the transitions
+    data['NSI_validated']=np.zeros(len(data['sbsmpl_t']), dtype=bool)
+    for i in np.arange(len(data['sbsmpl_t']))[::iTstate][1:-1]:
+        if np.array(np.abs(data['NSI'][i-iTstate:i+iTstate]-data['NSI'][i])<=Var_criteria).all():
+            data['NSI_validated'][i]=True
     
     
 if __name__=='__main__':

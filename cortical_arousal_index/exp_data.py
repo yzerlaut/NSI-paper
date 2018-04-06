@@ -53,7 +53,7 @@ def show_dataset(directory):
 ###############################################################
 
 def load_data(fn, args,
-              chosen_window_only=True):
+              chosen_window_only=True, full_processing=False):
 
     with open(fn.replace(s1, s2).replace('abf', 'json')) as f: props = json.load(f)
     
@@ -79,6 +79,20 @@ def load_data(fn, args,
     data['sbsmpl_Extra'] = data['Extra'][::isubsampling][:-1]
     data['sbsmpl_t'] = data['t'][::isubsampling][:-1]
     data['sbsmpl_dt'] = data['dt']*isubsampling
+
+    if full_processing:
+        # compute the pLFP
+        functions.preprocess_LFP(data,
+                                 freqs=np.linspace(args.f0/args.w0, args.f0*args.w0, args.wavelet_number),
+                                 new_dt=args.subsampling_period,
+                                 percentile_for_p0=args.percentile_for_p0,
+                                 smoothing=args.T0)
+        # compute the Network State Index
+        functions.compute_Network_State_Index(data,
+                                              Tstate=args.Tstate,
+                                              Var_criteria=args.Var_criteria,
+                                              T_sliding_mean=args.T_sliding_mean)
+
     
     return data
 
@@ -531,9 +545,16 @@ if __name__=='__main__':
     parser.add_argument('--file_index', help='0 means full data',
                         type=int, default=0)    
     # parameters of the analysis
-    parser.add_argument('--subsampling_period', type=float,default=5e-3)    
+    parser.add_argument('--subsampling_period', type=float,default=1e-3)    
     parser.add_argument('--spike_threshold', type=float,default=-35.)    
-
+    parser.add_argument('--f0', type=float,default=72.79)    
+    parser.add_argument('--w0', type=float, default=1.83)
+    parser.add_argument('--T0', type=float, default=42.17e-3)
+    parser.add_argument('--percentile_for_p0', type=float, default=0.01)
+    parser.add_argument('--Tstate', type=float, default=200e-3)
+    parser.add_argument('--Var_criteria', type=float, default=2.)
+    parser.add_argument('--T_sliding_mean', type=float, default=500e-3)
+    
     args = parser.parse_args()
 
     FIGS = []
