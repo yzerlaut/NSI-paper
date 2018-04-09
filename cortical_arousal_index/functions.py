@@ -125,9 +125,12 @@ def Validate_Network_States(data,
     iTstate = int(Tstate/data['sbsmpl_dt'])
     # validate the transitions
     data['NSI_validated'] = np.zeros(len(data['sbsmpl_t']), dtype=bool)
+    data['NSI_unvalidated'] = np.zeros(len(data['sbsmpl_t']), dtype=bool)
     for i in np.arange(len(data['sbsmpl_t']))[::iTstate][1:-1]:
         if np.array(np.abs(data['NSI'][i-iTstate:i+iTstate]-data['NSI'][i])<=Var_criteria).all():
             data['NSI_validated'][i]=True
+        else:
+            data['NSI_unvalidated'][i]=True
 
     data['t_NSI_validated'] = data['sbsmpl_t'][data['NSI_validated']]
     data['i_NSI_validated'] = np.arange(len(data['sbsmpl_t']))[data['NSI_validated']]

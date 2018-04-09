@@ -362,16 +362,19 @@ def test_different_alpha(args):
             cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>=0.)
             VM_LOW_FREQ_POWER_ASYNCH[it] = np.mean(DATA[icell]['Vm_max_low_freqs_power'][cond])
             N_ASYNCH[it] = len(DATA[icell]['NSI'][cond])
-            N_NC[it] = len(DATA[icell]['NSI'][np.invert(DATA[icell]['NSI_validated'])])
+            # then unvalidated states
+            N_NC[it] = len(DATA[icell]['NSI'][DATA[icell]['NSI_unvalidated']])
             
         np.save(DATASET[icell]['files'][0].replace('.abf', '_varying_alpha.npy'),
                 [VM_LOW_FREQ_POWER0, VM_LOW_FREQ_POWER_ASYNCH,
                  N_LOW_FREQ, N_ASYNCH, N_NC])
         print('=================================================')
-            
+
+    FILENAMES = []
     for icell, cell in enumerate(DATASET):
-        print('Cell '+str(icell+1)+' :', cell['files'][0])
-        DATA.append(load_data(cell['files'][0], args,
+        FILENAMES.append(cell['files'][0])
+        print('Cell '+str(icell+1)+' :', FILENAMES[-1])
+        DATA.append(load_data(FILENAMES[-1], args,
                               full_processing=True,
                               with_Vm_low_freq=True))
         
@@ -388,13 +391,14 @@ def test_different_alpha(args):
         for p in PROCESSES:
             p.join()
     
-    for i, cell in enumerate(DATASET):
+    for i, fn in enumerate(FILENAMES):
         VM_LOW_FREQ_POWER1[:, i],\
             VM_LOW_FREQ_POWER_ASYNCH1[:, i],\
             N_LOW_FREQ1[:, i], N_ASYNCH1[:, i], N_NC1[:, i] = \
-                np.load(cell['files'][0].replace('.abf', '_varying_alpha.npy'))
+                np.load(fn.replace('.abf', '_varying_alpha.npy'))
         
     OUTPUT = {'Params':args,
+              'FILENAMES':FILENAMES,
               'ALPHA':ALPHA,
               'VM_LOW_FREQ_POWER':VM_LOW_FREQ_POWER1,
               'VM_LOW_FREQ_POWER_ASYNCH':VM_LOW_FREQ_POWER_ASYNCH1,
