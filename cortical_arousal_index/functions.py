@@ -146,11 +146,11 @@ def compute_Network_State_Index(data,
 
         # low frequency power
         data['low_freqs'] = freqs # storing the used-freq
-        data['W_low_freqs'] = my_cwt(data['pLFP'], freqs, data['sbsmpl_dt']) # wavelet transform
+        data['W_low_freqs'] = my_cwt(data['pLFP'].flatten(), freqs, data['sbsmpl_dt']) # wavelet transform
         data['max_low_freqs_power'] = np.max(np.abs(data['W_low_freqs']), axis=0) # max of freq.
     
     if with_Vm_low_freq:
-        W = my_cwt(data['sbsmpl_Vm'], freqs, data['sbsmpl_dt']) # wavelet transform
+        W = my_cwt(data['sbsmpl_Vm'].flatten(), freqs, data['sbsmpl_dt']) # wavelet transform
         data['Vm_max_low_freqs_power'] = np.max(np.abs(W), axis=0) # max of freq.
 
     data['NSI']= Network_State_Index(data,
