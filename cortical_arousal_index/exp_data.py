@@ -53,7 +53,9 @@ def show_dataset(directory):
 ###############################################################
 
 def load_data(fn, args,
-              chosen_window_only=True, full_processing=False):
+              chosen_window_only=True,
+              full_processing=False,
+              with_Vm_low_freq=False):
 
     with open(fn.replace(s1, s2).replace('abf', 'json')) as f: props = json.load(f)
     
@@ -90,10 +92,10 @@ def load_data(fn, args,
         # compute the Network State Index
         functions.compute_Network_State_Index(data,
                                               Tstate=args.Tstate,
-                                              Var_criteria=args.Var_criteria,
+                                              Var_criteria=data['p0'], # HERE TAKING NOISE AS CRITERIA !!!
                                               alpha=args.alpha,
-                                              T_sliding_mean=args.T_sliding_mean)
-
+                                              T_sliding_mean=args.T_sliding_mean,
+                                              with_Vm_low_freq=with_Vm_low_freq)
     
     return data
 
@@ -274,6 +276,131 @@ def test_different_smoothing(args):
     OUTPUT = {'Params':args,
               'T_SMOOTH' : T_SMOOTH,
               'CROSS_CORRELS' : CROSS_CORRELS}
+    
+    np.savez(args.datafile_output, **OUTPUT)
+    
+def plot_test_different_smoothing(args):
+
+    OUTPUT = dict(np.load(args.datafile_input))
+
+    fig_optimum, [[ax, ax1]] = figure(figsize=(.5, .16),
+                                      right=0.85, top=0.9, bottom=1.2, left=.6, wspace=1.8,
+                                      axes=(1,2))
+    
+    i0 = np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))
+
+    mean_Output = np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)
+    
+    Tsmooth = 1e3*OUTPUT['T_SMOOTH']
+    ax.plot(Tsmooth, mean_Output, color='k', lw=2)
+    ax.scatter([1e3*OUTPUT['T_SMOOTH'][i0]], [np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)[i0]],
+               marker='o', color=Brown, facecolor='None')
+    ax.annotate('$T_{opt}$', (Tsmooth[i0]+4, ax.get_ylim()[0]), color=Brown, fontsize=FONTSIZE)
+    ax.plot(np.array([Tsmooth[i0], Tsmooth[i0]]),
+            [mean_Output[i0], ax.get_ylim()[0]], '--', color=Brown, lw=1)
+    
+    order = np.argsort(np.mean(OUTPUT['CROSS_CORRELS'], axis=0))
+    for i in range(len(order)):
+        ax1.plot(Tsmooth, OUTPUT['CROSS_CORRELS'][:,order[i]], color=viridis(i/(len(order)-1)))
+    ax1.plot(Tsmooth, mean_Output, '-', color='k', lw=0.5)
+    ax1.fill_between(Tsmooth,\
+                     mean_Output+np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
+                     mean_Output-np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
+                     lw=0, color='k', alpha=.2)
+
+    set_plot(ax, xlabel=' $T_{smoothing}$ (ms)',
+             ylabel='cc $V_m$-pLFP')
+    set_plot(ax1, xlabel=' $T_{smoothing}$ (ms)',
+             ylabel='cc $V_m$-pLFP')
+    acb = plt.axes([.86,.4,.02,.4])
+    cb = build_bar_legend(np.arange(len(order)),
+                          acb, viridis,
+                          no_ticks=True,
+                          label='cell index \n (n='+str(len(order))+'cells)')
+    return [fig_optimum]
+
+###############################################################
+##          Find the good low-freq criteria (alpha)          ##
+###############################################################
+
+def test_different_alpha(args):
+    
+    ALPHA = np.linspace(args.alpha_min,
+                        args.alpha_max,
+                        args.discretization)
+
+    DATASET = get_full_dataset(args)
+    DATA = []
+    VM_LOW_FREQ_POWER1 = np.zeros((len(ALPHA), len(DATASET)))
+    VM_LOW_FREQ_POWER_ASYNCH1 = np.zeros((len(ALPHA), len(DATASET)))
+    N_LOW_FREQ1, N_ASYNCH1, N_NC1 = [np.zeros((len(ALPHA), len(DATASET))) for i in range(3)]
+    
+    if args.parallelize:
+        PROCESSES = []
+        # Define an output queue
+        output = mp.Queue()
+        
+    def run_func(icell, output):
+        print('=================================================')
+        print('running cell', icell, '[...]')
+        VM_LOW_FREQ_POWER0 = np.zeros(len(ALPHA))
+        VM_LOW_FREQ_POWER_ASYNCH = np.zeros(len(ALPHA))
+        N_LOW_FREQ, N_ASYNCH, N_NC = np.zeros(len(ALPHA)), np.zeros(len(ALPHA)), np.zeros(len(ALPHA))
+
+        for it in range(len(ALPHA)):
+            print('running ', ALPHA[it], 'on cell', icell, '[...]')
+            # compute the Network State Index
+            functions.compute_Network_State_Index(DATA[icell],
+                                                  Tstate=args.Tstate,
+                                                  Var_criteria=DATA[icell]['p0'],
+                                                  alpha=ALPHA[it],
+                                                  already_low_freqs_and_mean=True)
+            # get Vm low freq power
+            cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']<0)
+            VM_LOW_FREQ_POWER0[it] = np.mean(DATA[icell]['Vm_max_low_freqs_power'][cond])
+            N_LOW_FREQ[it] = len(DATA[icell]['NSI'][cond])
+            cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>=0.)
+            VM_LOW_FREQ_POWER_ASYNCH[it] = np.mean(DATA[icell]['Vm_max_low_freqs_power'][cond])
+            N_ASYNCH[it] = len(DATA[icell]['NSI'][cond])
+            N_NC[it] = len(DATA[icell]['NSI'][np.invert(DATA[icell]['NSI_validated'])])
+            
+        np.save(DATASET[icell]['files'][0].replace('.abf', '_varying_alpha.npy'),
+                [VM_LOW_FREQ_POWER0, VM_LOW_FREQ_POWER_ASYNCH,
+                 N_LOW_FREQ, N_ASYNCH, N_NC])
+        print('=================================================')
+            
+    for icell, cell in enumerate(DATASET):
+        print('Cell '+str(icell+1)+' :', cell['files'][0])
+        DATA.append(load_data(cell['files'][0], args,
+                              full_processing=True,
+                              with_Vm_low_freq=True))
+        
+        if args.parallelize:
+            PROCESSES.append(mp.Process(target=run_func, args=(icell, output)))
+        else:
+            run_func(icell, 0)
+
+    if args.parallelize:
+        # Run processes
+        for p in PROCESSES:
+            p.start()
+        # # Exit the completed processes
+        for p in PROCESSES:
+            p.join()
+    
+    for i, cell in enumerate(DATASET):
+        VM_LOW_FREQ_POWER1[:, i],\
+            VM_LOW_FREQ_POWER_ASYNCH1[:, i],\
+            N_LOW_FREQ1[:, i], N_ASYNCH1[:, i], N_NC1[:, i] = \
+                np.load(cell['files'][0].replace('.abf', '_varying_alpha.npy'))
+        
+    OUTPUT = {'Params':args,
+              'ALPHA':ALPHA,
+              'VM_LOW_FREQ_POWER':VM_LOW_FREQ_POWER1,
+              'VM_LOW_FREQ_POWER_ASYNCH':VM_LOW_FREQ_POWER_ASYNCH1,
+              'N_LOW_FREQ':N_LOW_FREQ1,
+              'N_ASYNCH':N_ASYNCH1,
+              'N_NC':N_NC1}
     
     np.savez(args.datafile_output, **OUTPUT)
     
@@ -523,6 +650,11 @@ if __name__=='__main__':
     parser.add_argument('-ptds', "--plot_test_different_smoothing", help="",action="store_true")
     parser.add_argument('-smi', '--smoothing_min', type=float, default=5e-3)    
     parser.add_argument('-sma', '--smoothing_max', type=float, default=0.15)    
+    #### TEST DIFFERENT ALPHA (LOW-FREQ-THRESH-CRITERIA)
+    parser.add_argument('-tda', "--test_different_alpha", help="",action="store_true")
+    parser.add_argument('-ptda', "--plot_test_different_alpha", help="",action="store_true")
+    parser.add_argument('-ami', '--alpha_min', type=float, default=1.)    
+    parser.add_argument('-ama', '--alpha_max', type=float, default=4.)    
     #### SHOW A CELL
     parser.add_argument('-sc', "--show_cell", help="",action="store_true")
     #### COPMUTE FINAL pLFP
@@ -571,6 +703,10 @@ if __name__=='__main__':
         test_different_smoothing(args)
     elif args.plot_test_different_smoothing:
         FIGS = plot_test_different_smoothing(args)
+    elif args.test_different_alpha:
+        test_different_alpha(args)
+    elif args.plot_test_different_alpha:
+        FIGS = plot_test_different_alpha(args)
     elif args.show_cell:
         FIGS = show_cell(args)
     elif args.compute_final_pLFP:
