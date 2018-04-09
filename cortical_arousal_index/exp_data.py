@@ -253,9 +253,11 @@ def test_different_smoothing(args):
                 CROSS_CORRELS0)
         print('=================================================')
             
+    FILENAMES = []
     for icell, cell in enumerate(DATASET):
-        print('Cell '+str(icell+1)+' :', cell['files'][0])
-        DATA.append(load_data(cell['files'][0], args))
+        FILENAMES.append(cell['files'][0])
+        print('Cell '+str(icell+1)+' :', FILENAMES[-1])
+        DATA.append(load_data(FILENAMES[-1], args))
         
         if args.parallelize:
             PROCESSES.append(mp.Process(target=run_func, args=(icell, output)))
@@ -270,14 +272,16 @@ def test_different_smoothing(args):
         for p in PROCESSES:
             p.join()
     
-    for i, cell in enumerate(DATASET):
-        CROSS_CORRELS[:, i] = np.load(cell['files'][0].replace('.abf', '_wavelet_scan.npy'))
+    for i, fn in enumerate(FILENAMES):
+        CROSS_CORRELS[:, i] = np.load(fn.replace('.abf', '_wavelet_scan.npy'))
                 
     OUTPUT = {'Params':args,
+              'FILENAMES':FILENAMES,
               'T_SMOOTH' : T_SMOOTH,
               'CROSS_CORRELS' : CROSS_CORRELS}
     
     np.savez(args.datafile_output, **OUTPUT)
+    
     
 def plot_test_different_smoothing(args):
 
