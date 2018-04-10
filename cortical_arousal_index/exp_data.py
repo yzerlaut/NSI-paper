@@ -505,8 +505,8 @@ def get_polarization_level(args):
               'FILENAMES':FILENAMES,
               'NSI_ASYNCH_LEVELS':NSI_ASYNCH_LEVELS,
               'VM_ASYNCH_LEVELS':VM_ASYNCH_LEVELS,
-              'NSI_SYNCH_LEVELS':NSI_ASYNCH_LEVELS,
-              'VM_SYNCH_LEVELS':VM_ASYNCH_LEVELS,
+              'NSI_SYNCH_LEVELS':NSI_SYNCH_LEVELS,
+              'VM_SYNCH_LEVELS':VM_SYNCH_LEVELS,
               'PHASE':PHASE,
               'VM_PHASE_LEVELS':VM_PHASE_LEVELS}
     
