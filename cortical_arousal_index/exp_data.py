@@ -453,7 +453,7 @@ def get_polarization_level(args):
             for jj in range(len(phase_bins)):
                 cond = (np.digitize(phase, bins=phase_bins)==jj)
                 if len(vm[cond])>0:
-                    HIST[jj].append(np.mean(vm[cond & (vm<args.spike_threshold)])) # removing spikes
+                    HIST[jj].append(np.mean(vm[cond][vm[cond]<args.spike_threshold])) # removing spikes
         for jj in range(len(phase_bins)):
             if len(HIST[jj])>1:
                 FINAL_PHASE.append(phase_bins[jj])
