@@ -438,9 +438,9 @@ def get_polarization_level(args):
         print('=================================================')
         print('running cell', icell, '[...]')
         NSI_ASYN_LEVELS, VM_LEVELS = [], []
-        iTstate = int(args.Tstate/data['sbsmpl_dt'])
+        iTstate = int(args.Tstate/DATA[icell]['sbsmpl_dt'])
         cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>=0.) # ASYNCH COND !
-        for ii in np.arange(len(data['NSI']))[cond]:
+        for ii in np.arange(len(DATA[icell]['NSI']))[cond]:
             VM_LEVELS.append(np.mean(DATA[icell]['sbsmpl_Vm'][ii-iTstate:ii+Tstate]))
             NSI_ASYNCH_LEVELS.append(DATA[icell]['NSI'][ii])
         # adding the Vm level where plFP<p0, as the -1
