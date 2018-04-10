@@ -421,7 +421,8 @@ def get_polarization_level(args):
     
     DATASET = get_full_dataset(args)
     DATA = []
-    
+
+    # phase_bins = np.linspace()
     if args.parallelize:
         PROCESSES = []
         # Define an output queue
@@ -430,21 +431,43 @@ def get_polarization_level(args):
     def run_func(icell, output):
         print('=================================================')
         print('running cell', icell, '[...]')
-        NSI_ASYNCH_LEVELS, VM_LEVELS = [], []
-        NSI_SYNCH_PHASE_LEVELS, VM_PHASE_LEVELS = [], []
+        NSI_ASYNCH_LEVELS, VM_ASYNCH_LEVELS = [], []
+        NSI_SYNCH_LEVELS, VM_ASYNCH_LEVELS = [], []
+        phase_bins = np.linspace(-np.pi, np.pi, 30)
+        FINAL_PHASE, FINAL_HIST = [], []
         iTstate = int(args.Tstate/DATA[icell]['sbsmpl_dt'])
-        cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>=0.) # ASYNCH COND !
+        # ASYNCH COND !
+        cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>0.) 
         for ii in np.arange(len(DATA[icell]['NSI']))[cond]:
-            VM_LEVELS.append(np.mean(DATA[icell]['sbsmpl_Vm'][ii-iTstate:ii+iTstate]))
+            vm = DATA[icell]['sbsmpl_Vm'][ii-int(iTstate/2):ii+int(iTstate/2)]
+            VM_ASYNCH_LEVELS.append(np.mean(vm[vm < args.spike_threshold])) # removing spikes
             NSI_ASYNCH_LEVELS.append(DATA[icell]['NSI'][ii])
-        # adding the Vm level where plFP<p0, as the -1
+        # SYNCH COND !
+        cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']<0.) 
+        HIST = [[] for jj in range(len(phase_bins))]
+        for ii in np.arange(len(DATA[icell]['NSI']))[cond]:
+            vm = DATA[icell]['sbsmpl_Vm'][ii-int(iTstate/2):ii+int(iTstate/2)]
+            VM_SYNCH_LEVELS.append(np.max(vm[vm < args.spike_threshold])) # removing spikes
+            NSI_SYNCH_LEVELS.append(DATA[icell]['NSI'][ii])
+            phase = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))[ii-int(iTstate/2):ii+int(iTstate/2)]
+            for jj in range(len(phase_bins)):
+                cond = (np.digitize(phase, bins=phase_bins)==jj)
+                if len(vm[cond])>0:
+                    HIST[jj].append(np.mean(vm[cond & (vm<args.spike_threshold)])) # removing spikes
+        for jj in range(len(phase_bins)):
+            if len(HIST[jj])>1:
+                FINAL_PHASE.append(phase_bins[jj])
+                FINAL_HIST.append(np.mean(HIST[jj]))
+        # NO ACT CONDadding the Vm level where plFP<p0, as the -1
         cond = (DATA[icell]['pLFP']<DATA[icell]['p0'])
-        NSI_ASYNCH_LEVELS.append(-1)
-        VM_LEVELS.append(np.mean(DATA[icell]['sbsmpl_Vm'][cond]))
-        NSI_ASYNCH_LEVELS.append(-2) # and -2 is its variability
-        VM_LEVELS.append(np.std(DATA[icell]['sbsmpl_Vm'][cond]))
+        NSI_ASYNCH_LEVELS.append(0)
+        VM_ASYNCH_LEVELS.append(np.mean(DATA[icell]['sbsmpl_Vm'][cond]))
+        # NSI_ASYNCH_LEVELS.append(-2) # and -2 is its variability
+        # VM_ASYNCH_LEVELS.append(np.std(DATA[icell]['sbsmpl_Vm'][cond]))
         np.save(DATASET[icell]['files'][0].replace('.abf', '_depol_asynch_states.npy'),
-                [np.array(NSI_ASYN_LEVELS), np.array(VM_LEVELS)])
+                [np.array(NSI_ASYNCH_LEVELS), np.array(VM_ASYNCH_LEVELS),
+                 np.array(FINAL_PHASE), np.array(FINAL_HIST),
+                 np.array(NSI_SYNCH_LEVELS), np.array(VM_SYNCH_LEVELS)])
         print('=================================================')
 
     FILENAMES = []
@@ -453,7 +476,6 @@ def get_polarization_level(args):
         print('Cell '+str(icell+1)+' :', FILENAMES[-1])
         DATA.append(load_data(FILENAMES[-1], args,
                               full_processing=True))
-        
         if args.parallelize:
             PROCESSES.append(mp.Process(target=run_func, args=(icell, output)))
         else:
@@ -467,17 +489,26 @@ def get_polarization_level(args):
         for p in PROCESSES:
             p.join()
     
-    NSI_ASYN_LEVELS, VM_LEVELS = [], []
+    NSI_ASYNCH_LEVELS, VM_ASYNCH_LEVELS = [], []
+    NSI_SYNCH_LEVELS, VM_SYNCH_LEVELS = [], []
+    PHASE, VM_PHASE_LEVELS = [], []
     for i, fn in enumerate(FILENAMES):
-        x1, x2 = np.load(fn.replace('.abf', '_depol_asynch_states.npy')) 
-        NSI_ASYN_LEVELS.append(x1)
-        VM_LEVELS.append(x2)
-                
+        x1, x2, x3, x4, x5, x6 = np.load(fn.replace('.abf', '_depol_asynch_states.npy')) 
+        NSI_ASYNCH_LEVELS.append(x1)
+        VM_ASYNCH_LEVELS.append(x2)
+        PHASE.append(x3)
+        VM_PHASE_LEVELS.append(x4)
+        NSI_SYNCH_LEVELS.append(x5)
+        VM_SYNCH_LEVELS.append(x6)
         
     OUTPUT = {'Params':args,
               'FILENAMES':FILENAMES,
-              'NSI_ASYN_LEVELS':NSI_ASYN_LEVELS,
-              'VM_LEVELS':VM_LEVELS}
+              'NSI_ASYNCH_LEVELS':NSI_ASYNCH_LEVELS,
+              'VM_ASYNCH_LEVELS':VM_ASYNCH_LEVELS,
+              'NSI_SYNCH_LEVELS':NSI_ASYNCH_LEVELS,
+              'VM_SYNCH_LEVELS':VM_ASYNCH_LEVELS,
+              'PHASE':PHASE,
+              'VM_PHASE_LEVELS':VM_PHASE_LEVELS}
     
     np.savez(args.datafile_output, **OUTPUT)
 
@@ -651,7 +682,6 @@ def compare_correl_LFP_pLFP(args):
     fig, ax = figure()
     mean1, mean0 = 0, 0
     for i, cell in enumerate(DATASET):
-
         data = np.load(cell['files'][0].replace('.abf', '_pLFP.npz'))
         cc0 = np.abs(np.corrcoef(data['Vm'].flatten(), data['Extra'].flatten()))[0,1]
         cc1 = np.abs(np.corrcoef(data['Vm'].flatten(), data['pLFP'].flatten()))[0,1]
