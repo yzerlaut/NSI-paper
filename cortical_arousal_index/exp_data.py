@@ -323,6 +323,7 @@ def plot_test_different_smoothing(args):
                           label='cell index \n (n='+str(len(order))+'cells)')
     return [fig_optimum]
 
+
 ###############################################################
 ##          Find the good low-freq criteria (alpha)          ##
 ###############################################################
@@ -411,47 +412,82 @@ def test_different_alpha(args):
               'N_NC':N_NC1}
     
     np.savez(args.datafile_output, **OUTPUT)
+
+###############################################################
+##          Find the good low-freq criteria (alpha)          ##
+###############################################################
+
+def get_polarization_level(args):
     
-def plot_test_different_smoothing(args):
+    ALPHA = np.linspace(args.alpha_min,
+                        args.alpha_max,
+                        args.discretization)
 
-    OUTPUT = dict(np.load(args.datafile_input))
-
-    fig_optimum, [[ax, ax1]] = figure(figsize=(.5, .16),
-                                      right=0.85, top=0.9, bottom=1.2, left=.6, wspace=1.8,
-                                      axes=(1,2))
+    DATASET = get_full_dataset(args)
+    DATA = []
+    VM_LOW_FREQ_POWER1 = np.zeros((len(ALPHA), len(DATASET)))
+    VM_LOW_FREQ_POWER_ASYNCH1 = np.zeros((len(ALPHA), len(DATASET)))
+    N_LOW_FREQ1, N_ASYNCH1, N_NC1 = [np.zeros((len(ALPHA), len(DATASET))) for i in range(3)]
     
-    i0 = np.argmax(np.mean(OUTPUT['CROSS_CORRELS'], axis=-1))
+    if args.parallelize:
+        PROCESSES = []
+        # Define an output queue
+        output = mp.Queue()
+        
+    def run_func(icell, output):
+        print('=================================================')
+        print('running cell', icell, '[...]')
+        NSI_ASYN_LEVELS, VM_LEVELS = [], []
+        iTstate = int(args.Tstate/data['sbsmpl_dt'])
+        cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>=0.) # ASYNCH COND !
+        for ii in np.arange(len(data['NSI']))[cond]:
+            VM_LEVELS.append(np.mean(DATA[icell]['sbsmpl_Vm'][ii-iTstate:ii+Tstate]))
+            NSI_ASYNCH_LEVELS.append(DATA[icell]['NSI'][ii])
+        # adding the Vm level where plFP<p0, as the -1
+        cond = (DATA[icell]['pLFP']<DATA[icell]['p0'])
+        NSI_ASYNCH_LEVELS.append(-1)
+        VM_LEVELS.append(np.mean(DATA[icell]['sbsmpl_Vm'][cond]))
+        NSI_ASYNCH_LEVELS.append(-2) # and -2 is its variability
+        VM_LEVELS.append(np.std(DATA[icell]['sbsmpl_Vm'][cond]))
+        np.save(DATASET[icell]['files'][0].replace('.abf', '_depol_asynch_states.npy'),
+                [np.array(NSI_ASYN_LEVELS), np.array(VM_LEVELS)])
+        print('=================================================')
 
-    mean_Output = np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)
+    FILENAMES = []
+    for icell, cell in enumerate(DATASET):
+        FILENAMES.append(cell['files'][0])
+        print('Cell '+str(icell+1)+' :', FILENAMES[-1])
+        DATA.append(load_data(FILENAMES[-1], args,
+                              full_processing=True))
+        
+        if args.parallelize:
+            PROCESSES.append(mp.Process(target=run_func, args=(icell, output)))
+        else:
+            run_func(icell, 0)
+
+    if args.parallelize:
+        # Run processes
+        for p in PROCESSES:
+            p.start()
+        # # Exit the completed processes
+        for p in PROCESSES:
+            p.join()
     
-    Tsmooth = 1e3*OUTPUT['T_SMOOTH']
-    ax.plot(Tsmooth, mean_Output, color='k', lw=2)
-    ax.scatter([1e3*OUTPUT['T_SMOOTH'][i0]], [np.mean(OUTPUT['CROSS_CORRELS'], axis=-1)[i0]],
-               marker='o', color=Brown, facecolor='None')
-    ax.annotate('$T_{opt}$', (Tsmooth[i0]+4, ax.get_ylim()[0]), color=Brown, fontsize=FONTSIZE)
-    ax.plot(np.array([Tsmooth[i0], Tsmooth[i0]]),
-            [mean_Output[i0], ax.get_ylim()[0]], '--', color=Brown, lw=1)
+    NSI_ASYN_LEVELS, VM_LEVELS = [], []
+    for i, fn in enumerate(FILENAMES):
+        x1, x2 = np.load(fn.replace('.abf', '_depol_asynch_states.npy')) 
+        NSI_ASYN_LEVELS.append(x1)
+        VM_LEVELS.append(x2)
+                
+        
+    OUTPUT = {'Params':args,
+              'FILENAMES':FILENAMES,
+              'NSI_ASYN_LEVELS':NSI_ASYN_LEVELS,
+              'VM_LEVELS':VM_LEVELS}
     
-    order = np.argsort(np.mean(OUTPUT['CROSS_CORRELS'], axis=0))
-    for i in range(len(order)):
-        ax1.plot(Tsmooth, OUTPUT['CROSS_CORRELS'][:,order[i]], color=viridis(i/(len(order)-1)))
-    ax1.plot(Tsmooth, mean_Output, '-', color='k', lw=0.5)
-    ax1.fill_between(Tsmooth,\
-                     mean_Output+np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
-                     mean_Output-np.std(OUTPUT['CROSS_CORRELS'], axis=-1),
-                     lw=0, color='k', alpha=.2)
+    np.savez(args.datafile_output, **OUTPUT)
 
-    set_plot(ax, xlabel=' $T_{smoothing}$ (ms)',
-             ylabel='cc $V_m$-pLFP')
-    set_plot(ax1, xlabel=' $T_{smoothing}$ (ms)',
-             ylabel='cc $V_m$-pLFP')
-    acb = plt.axes([.86,.4,.02,.4])
-    cb = build_bar_legend(np.arange(len(order)),
-                          acb, viridis,
-                          no_ticks=True,
-                          label='cell index \n (n='+str(len(order))+'cells)')
-    return [fig_optimum]
-
+    
 def get_pLFP_parameters_from_scan(datafile1='data/final_wvl_scan.npz',
                                   datafile2='data/final_smooth.npz'):
     
@@ -663,6 +699,8 @@ if __name__=='__main__':
     parser.add_argument('-ptda', "--plot_test_different_alpha", help="",action="store_true")
     parser.add_argument('-ami', '--alpha_min', type=float, default=1.)    
     parser.add_argument('-ama', '--alpha_max', type=float, default=4.)    
+    #### Get Polarization levels
+    parser.add_argument('-gpl', "--get_polarization_level", help="",action="store_true")
     #### SHOW A CELL
     parser.add_argument('-sc', "--show_cell", help="",action="store_true")
     #### COPMUTE FINAL pLFP
@@ -723,6 +761,8 @@ if __name__=='__main__':
         FIGS = show_sample_with_pLFP(args)
     elif args.compare_correl_LFP_pLFP:
         FIGS = compare_correl_LFP_pLFP(args)
+    elif args.get_polarization_level:
+        get_polarization_level(args)
     else:
         pass
         
