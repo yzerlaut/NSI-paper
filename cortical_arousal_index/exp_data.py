@@ -447,9 +447,8 @@ def get_polarization_level(args):
         HIST = [[] for jj in range(len(phase_bins))]
         for ii in np.arange(len(DATA[icell]['NSI']))[cond]:
             vm = DATA[icell]['sbsmpl_Vm'][ii-int(iTstate/2):ii+int(iTstate/2)]
-            VM_SYNCH_LEVELS.append(np.max(functions.gaussian_smoothing(vm, int(20e-3/DATA[icell]['sbsmpl_dt']))))
-            # VM_SYNCH_LEVELS.append(DATA[icell]['Vm_max_low_freqs_power'][ii]+\
-            #                        DATA[icell]['Vm_sliding_mean'][ii]) # mean+enveloppe of [2,10]Hz
+            # VM_SYNCH_LEVELS.append(np.max(functions.gaussian_smoothing(vm, int(20e-3/DATA[icell]['sbsmpl_dt']))))
+            VM_SYNCH_LEVELS.append(DATA[icell]['Vm_max_low_freqs_power'][ii]) # enveloppe of [2,10]Hz
             NSI_SYNCH_LEVELS.append(DATA[icell]['NSI'][ii])
             phase = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))[ii-int(iTstate/2):ii+int(iTstate/2)]
             for jj in range(len(phase_bins)):
