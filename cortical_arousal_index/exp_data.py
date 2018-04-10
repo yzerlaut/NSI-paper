@@ -432,7 +432,7 @@ def get_polarization_level(args):
         print('=================================================')
         print('running cell', icell, '[...]')
         NSI_ASYNCH_LEVELS, VM_ASYNCH_LEVELS = [], []
-        NSI_SYNCH_LEVELS, VM_ASYNCH_LEVELS = [], []
+        NSI_SYNCH_LEVELS, VM_SYNCH_LEVELS = [], []
         phase_bins = np.linspace(-np.pi, np.pi, 30)
         FINAL_PHASE, FINAL_HIST = [], []
         iTstate = int(args.Tstate/DATA[icell]['sbsmpl_dt'])
