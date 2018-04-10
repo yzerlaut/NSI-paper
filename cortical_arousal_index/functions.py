@@ -156,6 +156,7 @@ def compute_Network_State_Index(data,
         W = my_cwt(data['sbsmpl_Vm'].flatten(), freqs, data['sbsmpl_dt']) # wavelet transform
         data['Vm_max_low_freqs_power'] = np.max(np.abs(W), axis=0) # max of freq.
         data['Vm_sliding_mean'] = gaussian_smoothing(data['sbsmpl_Vm'], int(2*T_sliding_mean/data['sbsmpl_dt']))
+        data['Vm_smooth'] = gaussian_smoothing(data['sbsmpl_Vm'], int(20e-3/data['sbsmpl_dt']))
 
     data['NSI']= Network_State_Index(data,
                                      alpha=alpha)
