@@ -419,15 +419,8 @@ def test_different_alpha(args):
 
 def get_polarization_level(args):
     
-    ALPHA = np.linspace(args.alpha_min,
-                        args.alpha_max,
-                        args.discretization)
-
     DATASET = get_full_dataset(args)
     DATA = []
-    VM_LOW_FREQ_POWER1 = np.zeros((len(ALPHA), len(DATASET)))
-    VM_LOW_FREQ_POWER_ASYNCH1 = np.zeros((len(ALPHA), len(DATASET)))
-    N_LOW_FREQ1, N_ASYNCH1, N_NC1 = [np.zeros((len(ALPHA), len(DATASET))) for i in range(3)]
     
     if args.parallelize:
         PROCESSES = []
@@ -437,11 +430,12 @@ def get_polarization_level(args):
     def run_func(icell, output):
         print('=================================================')
         print('running cell', icell, '[...]')
-        NSI_ASYN_LEVELS, VM_LEVELS = [], []
+        NSI_ASYNCH_LEVELS, VM_LEVELS = [], []
+        NSI_SYNCH_PHASE_LEVELS, VM_PHASE_LEVELS = [], []
         iTstate = int(args.Tstate/DATA[icell]['sbsmpl_dt'])
         cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>=0.) # ASYNCH COND !
         for ii in np.arange(len(DATA[icell]['NSI']))[cond]:
-            VM_LEVELS.append(np.mean(DATA[icell]['sbsmpl_Vm'][ii-iTstate:ii+Tstate]))
+            VM_LEVELS.append(np.mean(DATA[icell]['sbsmpl_Vm'][ii-iTstate:ii+iTstate]))
             NSI_ASYNCH_LEVELS.append(DATA[icell]['NSI'][ii])
         # adding the Vm level where plFP<p0, as the -1
         cond = (DATA[icell]['pLFP']<DATA[icell]['p0'])
