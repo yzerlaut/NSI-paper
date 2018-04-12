@@ -101,55 +101,63 @@ def preprocess_LFP(data,
         data['pLFP'] *= 1e3
 
     # find p0
-    Hist, be = np.histogram(data['pLFP'], bins=int(1./percentile_for_p0))
-    data['p0']=be[1]
+    data['p0'] = np.percentile(data['pLFP'], percentile_for_p0)
+    # find p0 for Vm
+    data['p0_Vm'] = np.percentile(data['sbsmpl_Vm'], percentile_for_p0)
 
 def heaviside(x):
     return (np.sign(x)+1)/2
 
 
 def Network_State_Index(data,
+                        p0=0.,
                         alpha=2.):
     
     NSI=np.zeros(len(data['sbsmpl_t']))
     # where rhythmicity is matched
-    X = (data['p0']+alpha*data['max_low_freqs_power'])-data['sliding_mean']
-    NSI = -2*data['max_low_freqs_power']*heaviside(X)+heaviside(-X)*(data['sliding_mean']-data['p0'])
+    X = (p0+alpha*data['max_low_freqs_power'])-data['sliding_mean']
+    NSI = -2*data['max_low_freqs_power']*heaviside(X)+heaviside(-X)*(data['sliding_mean']-p0)
     return NSI
 
 def Validate_Network_States(data, 
+                            target_key='NSI',
                             Tstate=200e-3,
                             Var_criteria=2):
     
     # validate states:
     iTstate = int(Tstate/data['sbsmpl_dt'])
     # validate the transitions
-    data['NSI_validated'] = np.zeros(len(data['sbsmpl_t']), dtype=bool)
-    data['NSI_unvalidated'] = np.zeros(len(data['sbsmpl_t']), dtype=bool)
+    data[target_key+'_validated'] = np.zeros(len(data['sbsmpl_t']), dtype=bool)
+    data[target_key+'_unvalidated'] = np.zeros(len(data['sbsmpl_t']), dtype=bool)
     for i in np.arange(len(data['sbsmpl_t']))[::iTstate][1:-1]:
-        if np.array(np.abs(data['NSI'][i-iTstate:i+iTstate]-data['NSI'][i])<=Var_criteria).all():
-            data['NSI_validated'][i]=True
+        if np.array(np.abs(data[target_key][i-iTstate:i+iTstate]-data[target_key][i])<=Var_criteria).all():
+            data[target_key+'_validated'][i]=True
         else:
-            data['NSI_unvalidated'][i]=True
+            data[target_key+'_unvalidated'][i]=True
 
-    data['t_NSI_validated'] = data['sbsmpl_t'][data['NSI_validated']]
-    data['i_NSI_validated'] = np.arange(len(data['sbsmpl_t']))[data['NSI_validated']]
+    data['t_'+target_key+'_validated'] = data['sbsmpl_t'][data[target_key+'_validated']]
+    data['i_'+target_key+'_validated'] = np.arange(len(data['sbsmpl_t']))[data[target_key+'_validated']]
 
     
 def compute_Network_State_Index(data,
+                                key='pLFP',
+                                target_key='NSI',
+                                p0_key='p0',
                                 freqs = np.linspace(2,10,20),
-                                Tstate=200e-3, Var_criteria=2,
+                                Tstate=200e-3,
+                                Var_criteria=2,
                                 alpha=2.,
                                 T_sliding_mean=0.5,
                                 with_Vm_low_freq=False,
                                 already_low_freqs_and_mean=False):
+    
     if not already_low_freqs_and_mean:
         # sliding mean
-        data['sliding_mean'] = gaussian_smoothing(data['pLFP'], int(T_sliding_mean/data['sbsmpl_dt']))
+        data['sliding_mean'] = gaussian_smoothing(data[key], int(T_sliding_mean/data['sbsmpl_dt']))
 
         # low frequency power
         data['low_freqs'] = freqs # storing the used-freq
-        data['W_low_freqs'] = my_cwt(data['pLFP'].flatten(), freqs, data['sbsmpl_dt']) # wavelet transform
+        data['W_low_freqs'] = my_cwt(data[key].flatten(), freqs, data['sbsmpl_dt']) # wavelet transform
         data['max_low_freqs_power'] = np.max(np.abs(data['W_low_freqs']), axis=0) # max of freq.
     
     if with_Vm_low_freq:
@@ -157,10 +165,12 @@ def compute_Network_State_Index(data,
         data['Vm_max_low_freqs_power'] = np.max(np.abs(W), axis=0) # max of freq.
         data['Vm_sliding_mean'] = gaussian_smoothing(data['sbsmpl_Vm'], int(2*T_sliding_mean/data['sbsmpl_dt']))
 
-    data['NSI']= Network_State_Index(data,
-                                     alpha=alpha)
+    data[target_key]= Network_State_Index(data,
+                                          p0 = data[p0_key],
+                                          alpha=alpha)
     
     Validate_Network_States(data,
+                            target_key=target_key,
                             Tstate=Tstate,
                             Var_criteria=Var_criteria)
     
