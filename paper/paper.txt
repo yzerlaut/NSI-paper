@@ -1,0 +1,288 @@
+* Identifying Network States from Extracellular Recordings during Wakefulness in Neocortex
+Short Title: Identifying Waking States from Extracellular Recordings
+Authors: [...]
+Short Authors: [...]
+Affiliations: 1. Neural Coding Laboratory @ Istituto Italiano di Tecnologia
+
+** Abstract
+
+[...]
+
+** Introduction
+
+During wakefulness, epochs corresponding to various levels of physiological and behavioral markers (such as pupil size and locomotion) have been correlated with various membrane potential signatures in rodent sensory cortices [[McGinley et al., 2015a, Reimer et al., 2014]]. Those observations led to the notion of various network states during wakefulness in neocortex [[McGinley et al., 2015b]], [...]
+
+Do such network states (with their granularity) have a correlate in terms of extracellular potential in neocortex? By combining intra- and extracellular recordings in awake mice somato-sensory cortex, we address this question in the present study.
+
+Understanding cortical processing during wakefulness would largely benefit from a quantitative measure of network states from commonly monitored electrophysiological signals. We provide here a Network State Index (NSI) giving a quantitative formulation to the “U-model of arousal” in sensory cortices [[McGinley et al., 2015a]] from a population signal: the extracellular potential.
+
+We first show that the extracellular potential can be transformed into a signal exhibiting a high correlation with the membrane potential of pyramidal neurons. From this signal, we can perform the classification of the low frequency and asynchronous periods with their granularity. We then stimate the accuracy of this classification by comparing them with the $V_m$-defined network states. Finally, we analyze the impact of the spectrum of network states displayed within a single recording (as captured by our measure) on the correlation between our two simultaneously recorded neurophysiological signals. We find that the variability of network states (beyond the fraction of occurence of slow rhythmic activity) is a key factor in shaping the correlation between those signals. This finding suggest that the variability of network states during wakefulness in a given experimental setting is a major contributor tp the measured correlation between different neurophysiological signals.
+
+** Results
+
+*** FIGURE: The time-varying high-gamma power of the extracellular potential exhibits a high correlation with the membrane potential of pyramidal neurons in awake mice S1.
+#+options: pLFP : multicolumn
+\bf (a) \normalfont Example simultaneous recording of the extracellular ($V_{ext}$, top) and membrane potential of a layer 2/3 pyramidal cell ($V_m$, bottom). In the middle, we show the time-varying high-gamma power (brown thin line) and its smoothed fluctuations (brown thick line, the pLFP signal). The $p_0$ value (brown dotted line) corresponds to the 100th percentile of the pLFP signal. \bf (b) \normalfont We look for the frequency band that maximizes the correlation with the simultaneously recorded membrane potential. This is achieved by varying independently a root frequency $f$ and a width factor $w$ yielding the frequency band [$f$/$w$, $f \cdot w$]. For each frequency band, we divide the band into 20 evenly spaced wavelet frequencies, we compute the mean over frequencies of the wavelet power (resulting in the time-varying power shown in \textbf{a}) and report the cross-correlation with the $V_m$ trace (cc $V_m$-pLFP). The optimal band is found for $f_{opt}$=92Hz and $w_{opt}$=1.8 \bf (c) \normalfont. Testing the effect of temporal smoothing on the cross-correlation with the $V_m$ signal. Shown for all cells (individual cells are color-coded). At $T_{smoothing}$=0ms, one can see the mean value of \textbf{a} and its variability over cells (black errorbar). \bf (d) \normalfont After normalization by their maximum amplitude (from their level at $T_{smoothing}$=0ms), a clear peak at $T_{opt}$=42ms appears.
+[[./Figures/Fig_pLFP_design.png]]
+
+
+*** The time-varying high-gamma power of the extracellular potential exhibits a high correlation with the membrane potential of pyramidal neurons in awake mice S1. 
+
+So far, the different waking states in rodent sensory cortices have been defined from their membrane potential signature ([[McGinley et al., 2015b]]). We therefore looked for a quantitative link between the extracellular signal $V_ext$ and the membrane potential $V_m$ fluctuations to apply such clssification.
+
+Although the the extracellular potential fluctuations can display high correlation with the membrane potential in awaking animals (cc$\sim$0.6, [[Poulet and Petersen, 2008]]), the extracellular signal is also subjected to drifts over long recordings (e.g. see episodes (i) and (ii) in Fig 1a) and its absolute value therefore does not constitute a reliable quantity on which one can rely to perform a robust classification. 
+
+Guided by findings under anesthesia ([[Mukovski et al., 2006]]), we hypothesized that the high-frequency content ($f$>40Hz) of the extracellular recording would provide a good predictor of the depolarization level. We therefore apply a wavelet transform to the extracellular signal and looked for the frequency band maximizing the cross-correlation with the membrane potential of a simultaneously recorded cell (see \textbf{Figure 1b}). We found that the optimal band was achieved for $f_{opt}$=92Hz and $w_{opt}$=1.8, i.e. the [50,200]Hz band. A temporal smoothing was found to improve the similarity with the $V_m$ signal, the optimal value was found to be $T_{opt}$=42ms.
+
+*** FIGURE: The Network State Index (NSI). Design and link with the $V_m$ fluctuations.
+#+options : Fig2 : multicolumn
+\textbf{(a)} Example samples of activity at different NSI levels (bottom) with their corresponding $V_m$ (top) and pLFP (middle) fluctuations. In episodes (1,2) the pLFP and $V_m$ signals exhibit low frequency activity at different powers. In episodes (3-6) the pLFP and $V_m$ signals exhibit non-rhythmic activity at various levels (in terms of both pLFP and depolarization levels). Three time-varying quantities derived from the pLFP signal are used to classify network states: (a weighted estimate of the low frequency contribution to the signal), (the pLFP sliding mean) and (the low frequency power of the pLFP signal). A consistency criterion validates a fraction of those as identified network states (brown dots).  \textbf{(b)} Full recording with the concomitant variations of $V_m$ (top), $V_m$ (middle) and NSI (bottom). We indicate where the samples shown in \textbf{a} have been extracted. \textbf{(c)} Fraction of Rhythmic, Non-Rhythmic and Unclassified States as a function of the parameter $\alpha$ (weighting the propensity to classify as Rhythmic states). \textbf{(d)} $V_m$ power of the [2,10]Hz band averaged across all identified Non-Rhythmic States for different values of the parameter $\alpha$. We fit the decay with an exponential function (dashed red line) and take its decay parameter as the optimal value for the classification. \textbf{(e)} $V_m$ power of the [2,10]Hz band in the samples (evaluated in 500ms time windows) averaged across all identified Rhythmic State (purple bar) and Non-Rhythmic States (kaki bar) from the pLFP signal. \textbf{(f)} Mean depolarization level over all identified Rhythmic states at various phase of the pLFP signal (obtained from the wavelet transform, see Methods). \textbf{(g)} Link between the granularity of the pLFP signal (captured by the NSI measure) and the $V_m$ fluctuations. Over the various Non-Rhythmic periods (kaki color), the graded variations of the pLFP signal are highly correlated with the mean depolarization level. On the other hand, over the various Rhythmic periods (purple color), the peak depolarization level exhibits a weak dependency on the amplitude of the pLFP power of such periods.
+[[./Figures/Fig_NSI_design.png]]
+
+
+*** Designing a Network State Index (NSI)
+
+After this trasnformation of the extracellular signal, we found that the previously evidenced $V_m$ signatures of network state ([[McGinley et al. 2015b]]) had a similar signature in terms of pLFP signal. On \textbf{Figure 2a}, one can see rhythmic activity at different power as well as non-rhythmic fluctuations at various activation levels.
+
+We add another signal processing step to classify network states. We first compute the time-varying mean $Y(t)$ of the fluctuations over a long time scale (500ms). We then compute the low frequency power of the fluctuations $Pow^{max}_{[2,10]Hz}$ (we take the maximum to account that rhtyhmicity can have varying frequencies in the [2,10]Hz band). From this time-varying signal, we define a weighted estimate of the contribution of the slow rhythm to the full signal $X(t) = p_0 + \alpha Pow^{max}_{[2,10]Hz}$ (shown on \textbf{Figure 1a} together with $Y$). By comparing this estimate with the sliding mean, we classify as "rhythmic" or "non-rhythmic" by computing the sign of the difference.  The parameter $\alpha$ therefore weights the propency to classify as rhythmic.
+
+Note that this classification relies on the difference between the average signal and the (and not on the low frequency power only) because when the pLFP signal increase its [2,10]Hz also increases (see the power in episode (6) in \textbf{Figure 2b} is equivalent to the episode (2) without exhibiting a clear rhythmicity, especially in the $V_m$ fluctuations).
+
+
+*** Link between Network State Index and $V_m$ fluctuations
+
+*** Limitations
+
+To investigate the limitations of the above classification, we compare the 
+
+*** FIGURE: All recorded cells sorted by their (full-trace) correlations between and the pLFP signal.
+#+options : All : multicolumn
+(a) A 30s sample of the simultaneous (grey trace) and (black trace) (b) Histogram of the NSI over the whole recording for each cell.
+[[./Figures/Fig_All_cells.png]]
+
+
+*** FIGURE: Link between network states distribution and full-trace correlations over different recordings.
+#+options : link
+(a) skdjf (b) ksjdf (c) sjdf
+[[./Figures/Fig_Link_NSI_Correl.png]]
+
+
+** Discussion
+
+[...]
+
+** References
+
+[[Chance et al., 2002]] Chance FS, Abbott LF, Reyes AD (2002) Gain modulation from background synaptic input. Neuron 35:773–782.
+
+[[Destexhe et al., 2003]] Destexhe A, Rudolph M, Pare D (2003) The high- conductance state of neocortical neurons in vivo. Nat Rev Neurosci 4:739–51.
+
+[[McGinley et al., 2015a]] McGinley, M.J.J., David, S.V. V, and McCormick, D.A.A. (2015). Cortical Membrane Potential Signature of Optimal States for Sensory Signal Detection. Neuron 87, 179–192.
+
+[[McGinley et al., 2015b]] McGinley, M.J., Vinck, M., Reimer, J., Batista-Brito, R., Zagha, E., Cadwell, C.R., Tolias, A.S., Cardin, J.A., and McCormick, D.A. (2015). Waking State: Rapid Variations Modulate Neural and Behavioral Responses. Neuron 87, 1143–1161.
+
+[[Mukovski et al., 2006]] Mukovski, M., Chauvette, S., Timofeev, I., \& Volgushev, M. (2006). Detection of active and silent states in neocortical neurons from the field potential signal during slow-wave sleep. Cerebral Cortex, 17(2), 400-414.
+
+[[Poulet and Petersen, 2008]] Poulet, J. F., \& Petersen, C. C. (2008). Internal brain state regulates membrane potential synchrony in barrel cortex of behaving mice. Nature, 454(7206), 881.
+
+[[Reimer et al., 2014]] Reimer, J., Froudarakis, E., Cadwell, C.R., Yatsenko, D., Denfield, G.H., and Tolias, A.S. (2014). Pupil fluctuations track fast switching of cortical states during quiet wakefulness. Neuron 84, 355–362.
+
+* Notes :noexport:
+
+*** FIGURE: Wavelet transform with its custom normalization
+\textbf{(a)} The Morlet wavelet at different frequencies (real and imaginary parts as plain and dashed lines respectively). \textbf{(b)} Time-frequency analysis based on the wavelet transform. Note that the chosen normalization (normalizing with respect to a sinusoid rather than the wavelet itself) insures that the amplitude of a modulated signals is kept in the amplitude of the wavelet transform.
+[[./Figures/Fig_Wavelet_Demo.png]]
+
+*** old biblio
+\bibliography{biblio}
+#+BEGIN_LATEX
+\begin{filecontents}{biblio.bib}
+
+@article{Vinck2015,
+  title={Arousal and locomotion make distinct contributions to cortical activity patterns and visual encoding},
+  author={Vinck, Martin and Batista-Brito, Renata and Knoblich, Ulf and Cardin, Jessica A},
+  journal={Neuron},
+  volume={86},
+  number={3},
+  pages={740--754},
+  year={2015},
+  publisher={Elsevier}
+}
+
+@article{Reimer2014,
+  title={Pupil fluctuations track fast switching of cortical states during quiet wakefulness},
+  author={Reimer, Jacob and Froudarakis, Emmanouil and Cadwell, Cathryn R and Yatsenko, Dimitri and Denfield, George H and Tolias, Andreas S},
+  journal={Neuron},
+  volume={84},
+  number={2},
+  pages={355--362},
+  year={2014},
+  publisher={Elsevier}
+}
+
+@article{McGinley2015a,
+  title={Cortical membrane potential signature of optimal states for sensory signal detection},
+  author={McGinley, Matthew J and David, Stephen V and McCormick, David A},
+  journal={Neuron},
+  volume={87},
+  number={1},
+  pages={179--192},
+  year={2015},
+  publisher={Elsevier}
+}
+
+@article{McGinley2015b,
+  title={Waking state: rapid variations modulate neural and behavioral responses},
+  author={McGinley, Matthew J and Vinck, Martin and Reimer, Jacob and Batista-Brito, Renata and Zagha, Edward and Cadwell, Cathryn R and Tolias, Andreas S and Cardin, Jessica A and McCormick, David A},
+  journal={Neuron},
+  volume={87},
+  number={6},
+  pages={1143--1161},
+  year={2015},
+  publisher={Elsevier}
+}
+
+@article{Tuckwell2002,
+   author = {Tuckwell, Henry C and Wan, Frederic Y M and Rospars, Jean-Pierre},
+   title = {A spatial stochastic neuronal model with Ornstein--Uhlenbeck input current},
+   journal = {Biological cybernetics},
+   volume = {86},
+   pages = {137-145},
+   year = {2002},
+   type = {Journal Article}
+}
+
+@article{Destexhe2003,
+   author = {Destexhe, A. and Rudolph, M. and Pare, D.},
+   title = {The high-conductance state of neocortical neurons in vivo},
+   journal = {Nat Rev Neurosci},
+   volume = {4},
+   number = {9},
+   pages = {739-51},
+   ISSN = {1471-003X (Print)
+1471-003X (Linking)},
+   DOI = {10.1038/nrn1198},
+   url = {http://www.ncbi.nlm.nih.gov/pubmed/12951566},
+   year = {2003},
+   type = {Journal Article}
+}
+
+@article{Chance2002,
+   author = {Chance, Frances S. and Abbott, L. F. and Reyes, Alex D.},
+   title = {Gain modulation from background synaptic input},
+   journal = {Neuron},
+   volume = {35},
+   pages = {773-782},
+   ISSN = {0896-6273 (Print)\n0896-6273 (Linking)},
+   DOI = {10.1016/S0896-6273(02)00820-6},
+   year = {2002},
+   type = {Journal Article}
+}
+
+@article{Reig2015,
+abstract = {The cortical network recurrent circuitry generates spontaneous activity organized into Up (active) and Down (quiescent) states during slow-wave sleep or anesthesia. These different states of cortical activation gain modulate synaptic transmission. However, the reported modulation that Up states impose on synaptic inputs is disparate in the literature, including both increases and decreases of responsiveness. Here, we tested the hypothesis that such disparate observations may depend on the intensity of the stimulation. By means of intracellular recordings, we studied synaptic transmission during Up and Down states in rat auditory cortex in vivo. Synaptic potentials were evoked either by auditory or electrical (thalamocortical, intracortical) stimulation while randomly varying the intensity of the stimulus. Synaptic potentials evoked by the same stimulus intensity were compared in Up/Down states. Up states had a scaling effect on the stimulus-evoked synaptic responses: the amplitude of weaker responses was potentiated whereas that of larger responses was maintained or decreased with respect to the amplitude during Down states. We used a computational model to explore the potential mechanisms explaining this nontrivial stimulus-response relationship. During Up/Down states, there is different excitability in the network and the neuronal conductance varies. We demonstrate that the competition between presynaptic recruitment and the changing conductance might be the central mechanism explaining the experimentally observed stimulus-response relationships. We conclude that the effect that cortical network activation has on synaptic transmission is not constant but contingent on the strength of the stimulation, with a larger modulation for stimuli involving both thalamic and cortical networks.},
+author = {Reig, Ramon and Zerlaut, Yann and Vergara, Ramiro and Destexhe, Alain and Sanchez-Vives, Maria V},
+doi = {10.1523/JNEUROSCI.2004-14.2015},
+file = {:home/yann/Documents/Mendeley/Reig et al. - 2015 - Gain modulation of synaptic inputs by network state in auditory cortex in vivo.pdf:pdf},
+issn = {1529-2401},
+journal = {The Journal of neuroscience : the official journal of the Society for Neuroscience},
+keywords = {cerebral cortex,computational model,oscillations,synaptic inputs,thalamocortical,up states},
+mendeley-groups = {Neuroscience},
+month = feb,
+number = {6},
+pages = {2689--702},
+pmid = {25673859},
+title = {{Gain modulation of synaptic inputs by network state in auditory cortex in vivo.}},
+url = {http://www.ncbi.nlm.nih.gov/pubmed/25673859},
+volume = {35},
+year = {2015}
+}
+
+@article{Heuer2002,
+abstract = {Contrast normalization is a process whereby responses of neurons are scaled according to the total amount of contrast in a region of the image nearby the receptive field of a neuron. This process allows neurons to code for informative scene or object attributes in a manner unaffected by changes in illumination. Evidence for normalization is seen in striate and extrastriate cortex from experiments where multiple stimuli are presented with a single receptive field (RF). Neuronal responses in such experiments are smaller than that predicted by linear summation, revealing the presence of normalization. While the presence of normalization is often clear, its mechanism is less so. To study the mechanism of normalization, we measured the interaction between pairs of brief local stimuli (spatial Gabor functions) within the RFs of cells in the middle temporal (MT or V5) area of monkeys and varied both the location and contrast of the stimuli. We found response summed approximately linearly when contrast was low but rapidly became normalized as stimulus contrast increased. The rapid transition to effective normalization at low contrasts suggested cooperativity in the normalization, and a model embodying such a cooperative step provided a good account of our data.},
+author = {Heuer, Hilary W and Britten, Kenneth H},
+doi = {10.1152/jn.00255.2002},
+file = {:home/yann/Documents/Mendeley/Heuer, Britten - 2002 - Contrast dependence of response normalization in area MT of the rhesus macaque.pdf:pdf},
+issn = {0022-3077},
+journal = {Journal of neurophysiology},
+keywords = {Animals,Contrast Sensitivity,Contrast Sensitivity: physiology,Macaca mulatta,Models, Neurological,Photic Stimulation,Photic Stimulation: methods,Reference Values,Temporal Lobe,Temporal Lobe: physiology},
+month = dec,
+number = {6},
+pages = {3398--408},
+pmid = {12466456},
+title = {{Contrast dependence of response normalization in area MT of the rhesus macaque.}},
+url = {http://www.ncbi.nlm.nih.gov/pubmed/12466456},
+volume = {88},
+year = {2002}
+}
+
+\end{filecontents}
+#+END_LATEX
+
+# #+LaTeX_HEADER: \renewcommand{\includegraphics}[2][]{\fbox{#2}}
+
+** basis
+
+#+LATEX_CLASS: article
+#+OPTIONS: toc:nil H:5 num:nil        (no Table Of COntents at all)
+#+LaTeX_CLASS_OPTIONS: [8pt, a4paper, twocolumn, twoside, colorlinks]
+#+LaTeX_HEADER:\setcounter{tocdepth}{5}
+#+LaTeX_HEADER:\usepackage{graphicx}
+#+LaTeX_HEADER:\usepackage[AUTO]{inputenc}
+#+LaTeX_HEADER:\usepackage[T1]{fontenc}
+#+LaTeX_HEADER:\usepackage{lmodern}
+#+LaTeX_HEADER:\usepackage{amsmath}
+# #+LaTeX_HEADER:\usepackage{amssymb,mathenv,array}
+#+LaTeX_HEADER:\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+#+LaTeX_HEADER: \usepackage{geometry}
+#+LaTeX_HEADER: \geometry{a4paper,total={210mm,297mm}, left=15mm, right=15mm, top=20mm, bottom=20mm, bindingoffset=0mm, columnsep=.5cm}
+#+LaTeX_HEADER: \usepackage[labelfont=bf]{caption}
+
+** affiliation and initial footnotes
+
+# # footnote without markers in main text !
+#+LaTeX_HEADER: \newcommand\blfootnote[1]{  \begingroup  \renewcommand\thefootnote{}\footnote{#1}  \addtocounter{footnote}{-1}  \endgroup}
+#+LaTeX_HEADER: \newcommand\affiliation[1]{  \begingroup  \renewcommand\thefootnote{}\footnote{ #1 }  \addtocounter{footnote}{-1}  \endgroup}
+#+LaTeX_HEADER: \newcommand\correspondence[1]{  \begingroup  \renewcommand\thefootnote{}\footnote{ $\dagger$ correspondence: #1}  \addtocounter{footnote}{-1}  \endgroup}
+#+LaTeX_HEADER: \newcommand\up[1]{\textsuperscript{#1}}
+#+LaTeX_HEADER: \def\dag{$\dagger$} 
+
+** header
+#+LaTeX_HEADER: \def\shorttitle{Identifying Waking States in Neocortex}
+#+LaTeX_HEADER: \def\shortauthor{...} 
+#+LaTeX_HEADER: \def\shortdate{\today} 
+
+** Hyperref setup
+#+LaTeX_HEADER: \hypersetup{allcolors = blue} % to have all the hyperlinks in 1 color
+#+LaTeX_HEADER: \def\todo#1{\marginpar{\colorbox{red}{TODO}}{(TODO: \textit{#1})}}
+
+** Headers and footers
+
+#+LaTeX_HEADER: \usepackage{fancyhdr} % Headers and footers
+#+LaTeX_HEADER: \pagestyle{fancy} % All pages have headers and footers
+#+LaTeX_HEADER: \fancyhead{} % Blank out the default header
+#+LaTeX_HEADER: \fancyfoot{} % Blank out the default footer
+#+LaTeX_HEADER: \fancyhead[C]{\footnotesize \shorttitle \quad $\bullet$ \quad \shortauthor \quad $\bullet$ \quad \shortdate \normalsize }
+#+LaTeX_HEADER: \fancyfoot[C]{\thepage} % Custom footer text
+#+LaTeX_HEADER: \makeatletter
+   
+** Title and Authors
+
+#+LaTeX_HEADER: \usepackage{titlesec} % Allows customization of titles
+# ## WE EXPLICIT THE FOOTNOTEMARK IN THE AUTHORS (for easier change) :
+#+LaTeX_HEADER:\renewcommand{\@fnsymbol}[1]{  \ensuremath{    \ifcase#1  \or \dagger    \or \ddagger    \or \mathsection    \or \mathparagraph    \else      \@ctrerr    \fi  } }
+#+LaTeX_HEADER: \def\@maketitle{  \newpage  \null  \vspace{-10mm}   \begin{center}  \let \footnote \thanks    {\LARGE \textbf{\@title} \par}    \vskip 1.2em    {\large      \lineskip .5em      \begin{tabular}[t]{c}        \scshape      \normalsize        \@author      \end{tabular}\par}   \vskip .6em   { \@date}  \end{center}  \par  \vskip 1em}
+#+LaTeX_HEADER: \makeatother
+#+LaTeX_HEADER: \renewcommand{\thefootnote}{\arabic{footnote}} % we restor the arabic number footnotes
+
+** biblio
+
+# # we delete the references name
+#+LaTeX_HEADER: \usepackage{filecontents}
+#+LaTeX_HEADER: \renewcommand{\refname}{\vspace{-.8cm}}
+#+LaTeX_HEADER: \usepackage{biology_citations}
+#+LaTeX_HEADER: \bibliographystyle{biology_citations}
+
+** supplementary
+#+LaTeX_HEADER: \newcommand{\beginsupplement}{\setcounter{table}{0} \renewcommand{\thetable}{S\arabic{table}} \setcounter{figure}{0} \renewcommand{\thefigure}{S\arabic{figure}}  }
+   
