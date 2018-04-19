@@ -444,7 +444,8 @@ def get_polarization_level(args):
             vm = DATA[icell]['sbsmpl_Vm'][ii-int(iTstate/2):ii+int(iTstate/2)]
             VM_ASYNCH_LEVELS.append(np.mean(vm[vm < args.spike_threshold])) # removing spikes
             NSI_ASYNCH_LEVELS.append(DATA[icell]['NSI'][ii])
-            phase = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))[ii-int(iTstate/2):ii+int(iTstate/2)]
+            # phase = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))[ii-int(iTstate/2):ii+int(iTstate/2)]
+            phase = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))[ii-1:ii+1]
             for jj in range(len(phase_bins)):
                 cond = (np.digitize(phase, bins=phase_bins)==jj)
                 if len(vm[cond])>0:
@@ -461,7 +462,8 @@ def get_polarization_level(args):
             # VM_SYNCH_LEVELS.append(np.max(functions.gaussian_smoothing(vm, int(20e-3/DATA[icell]['sbsmpl_dt']))))
             VM_SYNCH_LEVELS.append(DATA[icell]['Vm_max_low_freqs_power'][ii]) # enveloppe of [2,10]Hz
             NSI_SYNCH_LEVELS.append(DATA[icell]['NSI'][ii])
-            phase = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))[ii-int(iTstate/2):ii+int(iTstate/2)]
+            # phase = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))[ii-int(iTstate/2):ii+int(iTstate/2)]
+            phase = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))[ii-1:ii+1]
             for jj in range(len(phase_bins)):
                 cond = (np.digitize(phase, bins=phase_bins)==jj)
                 if len(vm[cond])>0:
