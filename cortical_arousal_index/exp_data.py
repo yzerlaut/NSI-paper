@@ -435,14 +435,25 @@ def get_polarization_level(args):
         NSI_SYNCH_LEVELS, VM_SYNCH_LEVELS = [], []
         phase_bins = np.linspace(-np.pi, np.pi, 30)
         FINAL_PHASE, FINAL_HIST = [], []
+        FINAL_PHASE_ASYNCH, FINAL_HIST_ASYNCH = [], []
         iTstate = int(args.Tstate/DATA[icell]['sbsmpl_dt'])
-        # ASYNCH COND !
+        # ====== ASYNCH COND ! =========
         cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>0.) 
+        HIST = [[] for jj in range(len(phase_bins))]
         for ii in np.arange(len(DATA[icell]['NSI']))[cond]:
             vm = DATA[icell]['sbsmpl_Vm'][ii-int(iTstate/2):ii+int(iTstate/2)]
             VM_ASYNCH_LEVELS.append(np.mean(vm[vm < args.spike_threshold])) # removing spikes
             NSI_ASYNCH_LEVELS.append(DATA[icell]['NSI'][ii])
-        # SYNCH COND !
+            phase = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))[ii-int(iTstate/2):ii+int(iTstate/2)]
+            for jj in range(len(phase_bins)):
+                cond = (np.digitize(phase, bins=phase_bins)==jj)
+                if len(vm[cond])>0:
+                    HIST[jj].append(np.mean(vm[cond][vm[cond]<args.spike_threshold])) # removing spikes
+        for jj in range(len(phase_bins)):
+            if len(HIST[jj])>1:
+                FINAL_PHASE_ASYNCH.append(phase_bins[jj])
+                FINAL_HIST_ASYNCH.append(np.mean(HIST[jj]))
+        # ====== SYNCH COND ! =========
         cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']<0.) 
         HIST = [[] for jj in range(len(phase_bins))]
         for ii in np.arange(len(DATA[icell]['NSI']))[cond]:
@@ -466,7 +477,8 @@ def get_polarization_level(args):
         # NSI_ASYNCH_LEVELS.append(-2) # and -2 is its variability
         # VM_ASYNCH_LEVELS.append(np.std(DATA[icell]['sbsmpl_Vm'][cond]))
         np.save(DATASET[icell]['files'][0].replace('.abf', '_depol_asynch_states.npy'),
-                [np.array(NSI_ASYNCH_LEVELS), np.array(VM_ASYNCH_LEVELS),
+                [np.array(FINAL_PHASE_ASYNCH), np.array(FINAL_HIST_ASYNCH),
+                 np.array(NSI_ASYNCH_LEVELS), np.array(VM_ASYNCH_LEVELS),
                  np.array(FINAL_PHASE), np.array(FINAL_HIST),
                  np.array(NSI_SYNCH_LEVELS), np.array(VM_SYNCH_LEVELS)])
         print('=================================================')
@@ -494,14 +506,17 @@ def get_polarization_level(args):
     NSI_ASYNCH_LEVELS, VM_ASYNCH_LEVELS = [], []
     NSI_SYNCH_LEVELS, VM_SYNCH_LEVELS = [], []
     PHASE, VM_PHASE_LEVELS = [], []
+    PHASE_ASYNCH, VM_PHASE_LEVELS_ASYNCH = [], []
     for i, fn in enumerate(FILENAMES):
-        x1, x2, x3, x4, x5, x6 = np.load(fn.replace('.abf', '_depol_asynch_states.npy')) 
-        NSI_ASYNCH_LEVELS.append(x1)
-        VM_ASYNCH_LEVELS.append(x2)
-        PHASE.append(x3)
-        VM_PHASE_LEVELS.append(x4)
-        NSI_SYNCH_LEVELS.append(x5)
-        VM_SYNCH_LEVELS.append(x6)
+        x1, x2, x3, x4, x5, x6, x7, x8 = np.load(fn.replace('.abf', '_depol_asynch_states.npy')) 
+        PHASE_ASYNCH.append(x1)
+        VM_PHASE_LEVELS_ASYNCH.append(x2)
+        NSI_ASYNCH_LEVELS.append(x3)
+        VM_ASYNCH_LEVELS.append(x4)
+        PHASE.append(x5)
+        VM_PHASE_LEVELS.append(x6)
+        NSI_SYNCH_LEVELS.append(x7)
+        VM_SYNCH_LEVELS.append(x8)
         
     OUTPUT = {'Params':args,
               'FILENAMES':FILENAMES,
@@ -510,7 +525,9 @@ def get_polarization_level(args):
               'NSI_SYNCH_LEVELS':NSI_SYNCH_LEVELS,
               'VM_SYNCH_LEVELS':VM_SYNCH_LEVELS,
               'PHASE':PHASE,
-              'VM_PHASE_LEVELS':VM_PHASE_LEVELS}
+              'VM_PHASE_LEVELS':VM_PHASE_LEVELS,
+              'PHASE_ASYNCH':PHASE_ASYNCH,
+              'VM_PHASE_LEVELS_ASYNCH':VM_PHASE_LEVELS_ASYNCH}
     
     np.savez(args.datafile_output, **OUTPUT)
 

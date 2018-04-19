@@ -6,9 +6,9 @@ Affiliations: 1. Neural Coding Laboratory @ Istituto Italiano di Tecnologia
 
 * Introduction
 
-During wakefulness, epochs corresponding to various levels of physiological and behavioral markers (such as pupil size and locomotion) have been correlated with various membrane potential signatures in rodent sensory cortices ([[McGinley et al., 2015a, Reimer et al., 2014]]). Those observations led to the notion of various network states during wakefulness in neocortex ([[McGinley et al., 2015b]]), [...]
+During wakefulness, epochs corresponding to various levels of physiological and behavioral markers (such as pupil size and locomotion) have been correlated with various membrane potential signatures in rodent sensory cortices (Polack et al., 2013; McGinley et al., 2015a; Reimer et al., 2014). Those observations led to the notion of various network states during wakefulness in neocortex (McGinley et al., 2015b; Busse et al., 2017). At low arousal levels (quantified by a low pupil diameter and the absence of motor behavior), the membrane potential fluctuations exhibit a [2,10]Hz oscillatory pattern in somato-sensory (Poulet and Petersen, 2008), auditory (McGinley et al., 2015b) and visual (Reimer et al., 2014) sensory cortices of rodents. and   [...]
 
-Do such network states (with their granularity) have a correlate in terms of extracellular potential in neocortex? By combining intra- and extracellular recordings in awake mice somato-sensory cortex, we address this question in the present study.
+Do such network states have a correlate in terms of extracellular potential in neocortex? And how does the observed granularity of those states ? By combining intra- and extracellular recordings in awake mice somato-sensory cortex, we address this question in the present study.
 
 Understanding cortical processing during wakefulness would largely benefit from a quantitative measure of network states from commonly
 monitored electrophysiological signals. We provide here a Network
