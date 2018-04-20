@@ -1,12 +1,10 @@
-# the impact of alpha on the granularity of the classification
-python exp_data.py -gpl -f data/final_depol_alpha05.npz --parallelize --alpha 0.5
-#python exp_data.py -gpl -f data/final_depol_alpha1.npz --parallelize --alpha 1.
-python exp_data.py -gpl -f data/final_depol_alpha15.npz --parallelize --alpha 1.5
-#python exp_data.py -gpl -f data/final_depol_alpha2.npz --parallelize --alpha 2.
-python exp_data.py -gpl -f data/final_depol_alpha25.npz --parallelize --alpha 2.5
-#python exp_data.py -gpl -f data/final_depol_alpha3.npz --parallelize --alpha 3.
-python exp_data.py -gpl -f data/final_depol_alpha35.npz --parallelize --alpha 3.5
-#python exp_data.py -gpl -f data/final_depol_alpha4.npz --parallelize --alpha 4.
-python exp_data.py -gpl -f data/final_depol_alpha45.npz --parallelize --alpha 4.5
-#python exp_data.py -gpl -f data/final_depol_alpha5.npz --parallelize --alpha 5.
-python exp_data.py -gpl -f data/final_depol_alpha55.npz --parallelize --alpha 5.5
+python exp_data.py -gpl -f data/final_depol_alpha100.npz --parallelize --alpha 1.0
+python exp_data.py -gpl -f data/final_depol_alpha144.npz --parallelize --alpha 1.44
+python exp_data.py -gpl -f data/final_depol_alpha189.npz --parallelize --alpha 1.89
+python exp_data.py -gpl -f data/final_depol_alpha233.npz --parallelize --alpha 2.33
+python exp_data.py -gpl -f data/final_depol_alpha278.npz --parallelize --alpha 2.78
+python exp_data.py -gpl -f data/final_depol_alpha322.npz --parallelize --alpha 3.22
+python exp_data.py -gpl -f data/final_depol_alpha367.npz --parallelize --alpha 3.67
+python exp_data.py -gpl -f data/final_depol_alpha411.npz --parallelize --alpha 4.11
+python exp_data.py -gpl -f data/final_depol_alpha455.npz --parallelize --alpha 4.56
+python exp_data.py -gpl -f data/final_depol_alpha500.npz --parallelize --alpha 5.0
