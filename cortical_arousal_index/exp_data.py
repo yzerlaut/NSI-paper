@@ -490,7 +490,7 @@ def get_polarization_level(args):
                 [np.array(FINAL_PHASE_ASYNCH), np.array(FINAL_HIST_ASYNCH),
                  np.array(NSI_ASYNCH_LEVELS), np.array(VM_ASYNCH_LEVELS),
                  np.array(FINAL_PHASE), np.array(FINAL_HIST),
-                 np.array(NSI_SYNCH_LEVELS), np.array(VM_SYNCH_LEVELS),,
+                 np.array(NSI_SYNCH_LEVELS), np.array(VM_SYNCH_LEVELS),
                  np.array(DVM_0PI_ASYNCH), np.array(DVM_0PI_SYNCH)])
         print('=================================================')
 
