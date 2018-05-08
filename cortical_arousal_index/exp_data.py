@@ -541,7 +541,7 @@ def get_polarization_level(args):
               'PHASE':PHASE,
               'VM_PHASE_LEVELS':VM_PHASE_LEVELS,
               'PHASE_ASYNCH':PHASE_ASYNCH,
-              'VM_PHASE_LEVELS_ASYNCH':VM_PHASE_LEVELS_ASYNCH
+              'VM_PHASE_LEVELS_ASYNCH':VM_PHASE_LEVELS_ASYNCH,
               'DVM_0PI_ASYNCH':DVM_0PI_ASYNCH,
               'DVM_0PI_SYNCH':DVM_0PI_SYNCH}
     
