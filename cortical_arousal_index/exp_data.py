@@ -433,6 +433,7 @@ def get_polarization_level(args):
         print('running cell', icell, '[...]')
         NSI_ASYNCH_LEVELS, VM_ASYNCH_LEVELS = [], []
         NSI_SYNCH_LEVELS, VM_SYNCH_LEVELS = [], []
+        DVM_0PI_ASYNCH, DVM_0PI_SYNCH = [], []
         phase_bins = np.linspace(-np.pi, np.pi, 30)
         FINAL_PHASE, FINAL_HIST = [], []
         FINAL_PHASE_ASYNCH, FINAL_HIST_ASYNCH = [], []
@@ -440,15 +441,20 @@ def get_polarization_level(args):
         # ====== ASYNCH COND ! =========
         cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>0.) 
         HIST = [[] for jj in range(len(phase_bins))]
+        phase_data = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))
         for ii in np.arange(len(DATA[icell]['NSI']))[cond]:
             vm = DATA[icell]['sbsmpl_Vm'][ii-int(iTstate/2):ii+int(iTstate/2)]
             VM_ASYNCH_LEVELS.append(np.mean(vm[vm < args.spike_threshold])) # removing spikes
             NSI_ASYNCH_LEVELS.append(DATA[icell]['NSI'][ii])
-            phase = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))[ii-int(iTstate/2):ii+int(iTstate/2)]
+            phase = phase_data[ii-int(iTstate/2):ii+int(iTstate/2)]
             for jj in range(len(phase_bins)):
                 cond = (np.digitize(phase, bins=phase_bins)==jj)
                 if len(vm[cond])>0:
                     HIST[jj].append(np.mean(vm[cond][vm[cond]<args.spike_threshold])) # removing spikes
+            # difference between the 0 and pi phase at the single cycle level:
+            cond_0_phase = np.abs(phase-0)<0.1
+            cond_pi_phase = np.abs(phase-np.pi)<0.1
+            DVM_0PI_ASYNCH.append(np.mean(vm[cond_0_phase])-np.mean(vm[cond_pi_phase]))
         for jj in range(len(phase_bins)):
             if len(HIST[jj])>1:
                 FINAL_PHASE_ASYNCH.append(phase_bins[jj])
@@ -461,11 +467,15 @@ def get_polarization_level(args):
             # VM_SYNCH_LEVELS.append(np.max(functions.gaussian_smoothing(vm, int(20e-3/DATA[icell]['sbsmpl_dt']))))
             VM_SYNCH_LEVELS.append(DATA[icell]['Vm_max_low_freqs_power'][ii]) # enveloppe of [2,10]Hz
             NSI_SYNCH_LEVELS.append(DATA[icell]['NSI'][ii])
-            phase = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))[ii-int(iTstate/2):ii+int(iTstate/2)]
+            phase = phase_data[ii-int(iTstate/2):ii+int(iTstate/2)]
             for jj in range(len(phase_bins)):
                 cond = (np.digitize(phase, bins=phase_bins)==jj)
                 if len(vm[cond])>0:
                     HIST[jj].append(np.mean(vm[cond][vm[cond]<args.spike_threshold])) # removing spikes
+            # difference between the 0 and pi phase at the single cycle level:
+            cond_0_phase = np.abs(phase-0)<0.1
+            cond_pi_phase = np.abs(phase-np.pi)<0.1
+            DVM_0PI_SYNCH.append(np.mean(vm[cond_0_phase])-np.mean(vm[cond_pi_phase]))
         for jj in range(len(phase_bins)):
             if len(HIST[jj])>1:
                 FINAL_PHASE.append(phase_bins[jj])
@@ -480,7 +490,8 @@ def get_polarization_level(args):
                 [np.array(FINAL_PHASE_ASYNCH), np.array(FINAL_HIST_ASYNCH),
                  np.array(NSI_ASYNCH_LEVELS), np.array(VM_ASYNCH_LEVELS),
                  np.array(FINAL_PHASE), np.array(FINAL_HIST),
-                 np.array(NSI_SYNCH_LEVELS), np.array(VM_SYNCH_LEVELS)])
+                 np.array(NSI_SYNCH_LEVELS), np.array(VM_SYNCH_LEVELS),,
+                 np.array(DVM_0PI_ASYNCH), np.array(DVM_0PI_SYNCH)])
         print('=================================================')
 
     FILENAMES = []
@@ -507,8 +518,9 @@ def get_polarization_level(args):
     NSI_SYNCH_LEVELS, VM_SYNCH_LEVELS = [], []
     PHASE, VM_PHASE_LEVELS = [], []
     PHASE_ASYNCH, VM_PHASE_LEVELS_ASYNCH = [], []
+    DVM_0PI_ASYNCH, DVM_0PI_SYNCH = [], []
     for i, fn in enumerate(FILENAMES):
-        x1, x2, x3, x4, x5, x6, x7, x8 = np.load(fn.replace('.abf', '_depol_asynch_states.npy')) 
+        x1, x2, x3, x4, x5, x6, x7, x8, x9, x10 = np.load(fn.replace('.abf', '_depol_asynch_states.npy')) 
         PHASE_ASYNCH.append(x1)
         VM_PHASE_LEVELS_ASYNCH.append(x2)
         NSI_ASYNCH_LEVELS.append(x3)
@@ -517,6 +529,8 @@ def get_polarization_level(args):
         VM_PHASE_LEVELS.append(x6)
         NSI_SYNCH_LEVELS.append(x7)
         VM_SYNCH_LEVELS.append(x8)
+        DVM_0PI_ASYNCH.append(x9)
+        DVM_0PI_SYNCH.append(x10)
         
     OUTPUT = {'Params':args,
               'FILENAMES':FILENAMES,
@@ -527,7 +541,9 @@ def get_polarization_level(args):
               'PHASE':PHASE,
               'VM_PHASE_LEVELS':VM_PHASE_LEVELS,
               'PHASE_ASYNCH':PHASE_ASYNCH,
-              'VM_PHASE_LEVELS_ASYNCH':VM_PHASE_LEVELS_ASYNCH}
+              'VM_PHASE_LEVELS_ASYNCH':VM_PHASE_LEVELS_ASYNCH
+              'DVM_0PI_ASYNCH':DVM_0PI_ASYNCH,
+              'DVM_0PI_SYNCH':DVM_0PI_SYNCH}
     
     np.savez(args.datafile_output, **OUTPUT)
 
