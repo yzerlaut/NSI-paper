@@ -110,13 +110,14 @@ def heaviside(x):
 
 
 def Network_State_Index(data,
+                        key='pLFP',
                         p0=0.,
                         alpha=2.):
     
     NSI=np.zeros(len(data['sbsmpl_t']))
     # where rhythmicity is matched
-    X = (p0+alpha*data['max_low_freqs_power'])-data['sliding_mean']
-    NSI = -2*data['max_low_freqs_power']*heaviside(X)+heaviside(-X)*(data['sliding_mean']-p0)
+    X = (p0+alpha*data[key+'_max_low_freqs_power'])-data[key+'_sliding_mean']
+    NSI = -2*data[key+'_max_low_freqs_power']*heaviside(X)+heaviside(-X)*(data[key+'_sliding_mean']-p0)
     return NSI
 
 def Validate_Network_States(data, 
@@ -145,34 +146,36 @@ def compute_Network_State_Index(data,
                                 p0_key='p0',
                                 freqs = np.linspace(2,10,20),
                                 Tstate=200e-3,
-                                Var_criteria=2,
                                 alpha=2.,
-                                T_sliding_mean=0.5,
                                 with_Vm_low_freq=False,
+                                T_sliding_mean=0.5,
+                                validate=True,
+                                Var_criteria=2,
                                 already_low_freqs_and_mean=False):
     
     if not already_low_freqs_and_mean:
         # sliding mean
-        data['sliding_mean'] = gaussian_smoothing(data[key], int(T_sliding_mean/data['sbsmpl_dt']))
-
+        data[key+'_sliding_mean'] = gaussian_smoothing(data[key], int(T_sliding_mean/data['sbsmpl_dt']))
         # low frequency power
-        data['low_freqs'] = freqs # storing the used-freq
-        data['W_low_freqs'] = my_cwt(data[key].flatten(), freqs, data['sbsmpl_dt']) # wavelet transform
-        data['max_low_freqs_power'] = np.max(np.abs(data['W_low_freqs']), axis=0) # max of freq.
+        data[key+'_low_freqs'] = freqs # storing the used-freq
+        data[key+'_W_low_freqs'] = my_cwt(data[key].flatten(), freqs, data['sbsmpl_dt']) # wavelet transform
+        data[key+'_max_low_freqs_power'] = np.max(np.abs(data[key+'_W_low_freqs']), axis=0) # max of freq.
     
     if with_Vm_low_freq:
         W = my_cwt(data['sbsmpl_Vm'].flatten(), freqs, data['sbsmpl_dt']) # wavelet transform
         data['Vm_max_low_freqs_power'] = np.max(np.abs(W), axis=0) # max of freq.
-        data['Vm_sliding_mean'] = gaussian_smoothing(data['sbsmpl_Vm'], int(2*T_sliding_mean/data['sbsmpl_dt']))
+        data['Vm_sliding_mean'] = gaussian_smoothing(data['sbsmpl_Vm'], int(T_sliding_mean/data['sbsmpl_dt']))
 
     data[target_key]= Network_State_Index(data,
+                                          key=key,
                                           p0 = data[p0_key],
                                           alpha=alpha)
-    
-    Validate_Network_States(data,
-                            target_key=target_key,
-                            Tstate=Tstate,
-                            Var_criteria=Var_criteria)
+
+    if validate:
+        Validate_Network_States(data,
+                                target_key=target_key,
+                                Tstate=Tstate,
+                                Var_criteria=Var_criteria)
     
     
 if __name__=='__main__':
