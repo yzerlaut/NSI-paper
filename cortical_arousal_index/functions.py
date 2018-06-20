@@ -34,6 +34,9 @@ def Morlet_Wavelet(t, f, w0=6.):
     return output
 
 def Morlet_Wavelet_Decay(f, w0=6.):
+    """
+    Time value of the wavelet where the amplitude decays of 
+    """
     return 2 ** .5 * (w0/(np.pi*f))
 
 def from_fourier_to_morlet(freq):
