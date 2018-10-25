@@ -163,6 +163,8 @@ def compute_Network_State_Index(data,
         data[key+'_low_freqs'] = freqs # storing the used-freq
         data[key+'_W_low_freqs'] = my_cwt(data[key].flatten(), freqs, data['sbsmpl_dt']) # wavelet transform
         data[key+'_max_low_freqs_power'] = np.max(np.abs(data[key+'_W_low_freqs']), axis=0) # max of freq.
+        imax = np.argmax(np.abs(data[key+'_W_low_freqs']), axis=0)
+        data[key+'_phase_of_max_low_freqs_power'] = np.angle([data[key+'_W_low_freqs'][imax[i], i] for i in range(len(imax))])
     
     if with_Vm_low_freq:
         W = my_cwt(data['sbsmpl_Vm'].flatten(), freqs, data['sbsmpl_dt']) # wavelet transform
@@ -179,7 +181,6 @@ def compute_Network_State_Index(data,
                                 target_key=target_key,
                                 Tstate=Tstate,
                                 Var_criteria=Var_criteria)
-    
     
 if __name__=='__main__':
     print(gaussian_smoothing(np.linspace(0,100,50), 1.3)) # translating to integer values... so keep in mind

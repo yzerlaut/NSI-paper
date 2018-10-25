@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pylab as plt
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 from data_analysis.IO.load_data import load_file
+from data_analysis.processing.filters import butter_bandpass_filter
+from data_analysis.processing.signanalysis import gaussian_smoothing
 from graphs.my_graph import *
 from graphs.plot_export import put_list_of_figs_to_multipage_pdf
 from matplotlib.cm import viridis, copper, plasma, gray, binary
@@ -96,7 +98,17 @@ def load_data(fn, args,
                                               alpha=args.alpha,
                                               T_sliding_mean=args.T_sliding_mean,
                                               with_Vm_low_freq=with_Vm_low_freq)
-    
+        # MUA from extracellular signal 
+        data['MUA'] = gaussian_smoothing(\
+                        np.abs(butter_bandpass_filter(data['Extra'],\
+                                 args.MUA_band[0], args.MUA_band[1], 1./data['dt'], order=5)),\
+                                       int(args.MUA_smoothing/data['dt']))
+
+        data['sbsmpl_MUA'] = 1e-3*data['MUA'][::int(args.subsampling_period/data['dt'])][:-1] # in uV
+        # Spike times from Vm
+        data['tspikes'] = data['t'][np.argwhere((data['Vm'][:-1]<=args.spike_threshold) & (data['Vm'][1:]>args.spike_threshold)).flatten()]
+        data['sbsmpl_FR'] = np.histogram(data['tspikes'], bins=data['sbsmpl_t'])[0]/data['sbsmpl_dt']    
+        
     return data
 
 ###############################################################
@@ -547,6 +559,128 @@ def get_polarization_level(args):
     
     np.savez(args.datafile_output, **OUTPUT)
 
+def extended_NSI_correlate_analysis(args):
+    
+    DATASET = get_full_dataset(args)
+    DATA = []
+
+    NSI_DISCRET = np.array([-20, -5, 0, 5, 10, 40])
+    phase_bins = np.linspace(-np.pi, np.pi, 30)
+
+    if args.parallelize:
+        PROCESSES = []
+        # Define an output queue
+        output = mp.Queue()
+
+
+    def run_func(icell, output):
+        print('=================================================')
+        print('running cell', icell, '[...]')
+        iTstate = int(args.Tstate/DATA[icell]['sbsmpl_dt'])
+        output = {'NSI_DISCRET':NSI_DISCRET,
+                  'phase_bins': phase_bins,
+                  'Vm0':DATA[icell]['p0_Vm'],
+                  'NSI_LEVELS':[[] for i in range(len(NSI_DISCRET)-1)],
+                  'FR_LEVELS':[[] for i in range(len(NSI_DISCRET)-1)],
+                  'MUA_LEVELS':[[] for i in range(len(NSI_DISCRET)-1)],
+                  'DEPOL_LEVELS':[[] for i in range(len(NSI_DISCRET)-1)],
+                  'LINK_DEPOL_PHASE':np.ones((len(NSI_DISCRET)-1, len(phase_bins)))*np.inf,
+                  'LINK_STD_DEPOL_PHASE':np.ones((len(NSI_DISCRET)-1, len(phase_bins)))*np.inf,
+                  'LINK_FR_PHASE':np.ones((len(NSI_DISCRET)-1, len(phase_bins)))*np.inf,
+                  'LINK_MUA_PHASE':np.ones((len(NSI_DISCRET)-1, len(phase_bins)))*np.inf}
+        
+        
+
+        for iND in range(len(NSI_DISCRET)-1):
+            cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>NSI_DISCRET[iND]) & (DATA[icell]['NSI']<=NSI_DISCRET[iND+1])
+
+            HISTVM = [[] for ipb in range(len(phase_bins))]
+            HISTMUA = [[] for ipb in range(len(phase_bins))]
+            HISTFR = [[] for ipb in range(len(phase_bins))]
+            
+            for iEp in np.arange(len(DATA[icell]['NSI']))[cond]:
+                # store the exact NSI level
+                output['NSI_LEVELS'][iND].append(DATA[icell]['NSI'][iEp])
+                # compute the depol level from the Vm
+                vm = DATA[icell]['sbsmpl_Vm'][iEp-int(iTstate/2):iEp+int(iTstate/2)]
+                output['DEPOL_LEVELS'][iND].append(np.mean(vm[vm < args.spike_threshold])) # removing spikes
+                # compute the mua
+                mua = DATA[icell]['sbsmpl_MUA'][iEp-int(iTstate/2):iEp+int(iTstate/2)]
+                output['MUA_LEVELS'][iND].append(np.mean(mua))
+                # compute the firing rate of single cells
+                firing_rate = DATA[icell]['sbsmpl_FR'][iEp-int(iTstate/2):iEp+int(iTstate/2)]
+                output['FR_LEVELS'][iND].append(np.mean(firing_rate))
+
+                
+                phase = DATA[icell]['pLFP_phase_of_max_low_freqs_power'][iEp-int(iTstate/2):iEp+int(iTstate/2)]
+                
+                for ipb in range(len(phase_bins)):
+                    phase_cond = (np.digitize(phase, bins=phase_bins)==ipb)
+                    if len(vm[phase_cond])>0:
+                        HISTVM[ipb].append(np.mean(vm[phase_cond][vm[phase_cond]<args.spike_threshold])) # removing spikes
+                    if len(mua[phase_cond])>0:
+                        HISTMUA[ipb].append(np.mean(mua[phase_cond]))
+                    if len(firing_rate[phase_cond])>0:
+                        HISTFR[ipb].append(np.mean(firing_rate[phase_cond]))
+
+
+            for ipb in range(len(phase_bins)):
+                if len(HISTVM[ipb])>0:
+                     output['LINK_DEPOL_PHASE'][iND, :] = np.array([np.mean(HISTVM[ipb]) for ipb in range(len(phase_bins))])
+                     output['LINK_STD_DEPOL_PHASE'][iND, :] = np.array([np.std(HISTVM[ipb]) for ipb in range(len(phase_bins))])
+                if len(HISTFR[ipb])>0:
+                    output['LINK_FR_PHASE'][iND, :] = np.array([np.mean(HISTFR[ipb]) for ipb in range(len(phase_bins))])
+                if len(HISTMUA[ipb])>0:
+                    output['LINK_MUA_PHASE'][iND, :] = np.array([np.mean(HISTMUA[ipb]) for ipb in range(len(phase_bins))])
+
+                    
+        np.savez(DATASET[icell]['files'][0].replace('.abf', '_extended_analysis.npz'), **output)
+        print('=================================================')
+
+    FILENAMES = []
+    for icell, cell in enumerate(DATASET):
+        FILENAMES.append(cell['files'][0])
+        print('Cell '+str(icell+1)+' :', FILENAMES[-1])
+        DATA.append(load_data(FILENAMES[-1], args,
+                              with_Vm_low_freq=True,
+                              full_processing=True))
+        if args.parallelize:
+            PROCESSES.append(mp.Process(target=run_func, args=(icell, output)))
+        else:
+            run_func(icell, 0)
+
+    if args.parallelize:
+        # Run processes
+        for p in PROCESSES:
+            p.start()
+        # # Exit the completed processes
+        for p in PROCESSES:
+            p.join()
+    
+    OUTPUT = {'NSI_DISCRET':NSI_DISCRET,
+              'phase_bins': phase_bins,
+              'Vm0':np.zeros(len(FILENAMES)),
+              'NSI_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
+              'FR_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
+              'MUA_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
+              'DEPOL_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
+              'LINK_DEPOL_PHASE':np.ones((len(FILENAMES), len(NSI_DISCRET)-1, len(phase_bins)))*np.inf,
+              'LINK_STD_DEPOL_PHASE':np.ones((len(FILENAMES), len(NSI_DISCRET)-1, len(phase_bins)))*np.inf,
+              'LINK_FR_PHASE':np.ones((len(FILENAMES), len(NSI_DISCRET)-1, len(phase_bins)))*np.inf,
+              'LINK_MUA_PHASE':np.ones((len(FILENAMES), len(NSI_DISCRET)-1, len(phase_bins)))*np.inf}
+    for icell, fn in enumerate(FILENAMES):
+        output = np.load(fn.replace('.abf', '_extended_analysis.npz'))
+        OUTPUT['Vm0'][icell] = output['Vm0']
+        OUTPUT['NSI_LEVELS'][icell] = np.array(output['NSI_LEVELS']).flatten()
+        OUTPUT['FR_LEVELS'][icell] = np.array(output['FR_LEVELS']).flatten()
+        OUTPUT['MUA_LEVELS'][icell] = np.array(output['MUA_LEVELS']).flatten()
+        OUTPUT['DEPOL_LEVELS'][icell] = np.array(output['DEPOL_LEVELS']).flatten()
+        OUTPUT['LINK_DEPOL_PHASE'][icell,:,:] = output['LINK_DEPOL_PHASE']
+        OUTPUT['LINK_STD_DEPOL_PHASE'][icell,:,:] = output['LINK_STD_DEPOL_PHASE']
+        OUTPUT['LINK_FR_PHASE'][icell,:,:] = output['LINK_FR_PHASE']
+        OUTPUT['LINK_MUA_PHASE'][icell,:,:] = output['LINK_MUA_PHASE']
+    np.savez(args.datafile_output, **OUTPUT)
+    
     
 def get_pLFP_parameters_from_scan(datafile1='data/final_wvl_scan.npz',
                                   datafile2='data/final_smooth.npz'):
@@ -760,6 +894,8 @@ if __name__=='__main__':
     parser.add_argument('-ama', '--alpha_max', type=float, default=4.)    
     #### Get Polarization levels
     parser.add_argument('-gpl', "--get_polarization_level", help="",action="store_true")
+    #### Extended NSI correlate analysis
+    parser.add_argument('-enca', "--extended_NSI_correlate_analysis", help="",action="store_true")
     #### SHOW A CELL
     parser.add_argument('-sc', "--show_cell", help="",action="store_true")
     #### COPMUTE FINAL pLFP
@@ -793,6 +929,9 @@ if __name__=='__main__':
     parser.add_argument('--Var_criteria', type=float, default=2.)
     parser.add_argument('--T_sliding_mean', type=float, default=500e-3)
     parser.add_argument('--alpha', type=float, default=2.65)
+    # parameters of Multi-Unit-Activity (MUA)
+    parser.add_argument('--MUA_band', nargs='+', type=float, default=[300., 3000.])
+    parser.add_argument('--MUA_smoothing', type=float, default=20e-3)
     
     args = parser.parse_args()
 
@@ -822,6 +961,8 @@ if __name__=='__main__':
         FIGS = compare_correl_LFP_pLFP(args)
     elif args.get_polarization_level:
         get_polarization_level(args)
+    elif args.extended_NSI_correlate_analysis:
+        extended_NSI_correlate_analysis(args)
     else:
         pass
         
