@@ -1,20 +1,23 @@
 Identifying Network States from Extracellular Recordings during Wakefulness in Neocortex
 Short Title: Identifying Waking States from Extracellular Recordings
 Affiliations: *1* Neural Coding Laboratory, Istituto Italiano di Tecnologia, Genova and Rovereto, Italy. *2* Neural Computation Laboratory, Center for Neuroscience and Cognitive Systems @UniTn, Istituto Italiano di Tecnologia, Rovereto, Italy. *3* Optical Approaches to Brain Function Laboratory, Istituto Italiano di Tecnologia, Genova, Italy.
-Correspondence: Y.Z. ([[yann.zerlaut@iit.it]]), T.F. ([[tommaso.fellin@iit.it]]), S.P. ([[stefano.panzeri@iit.it]])
-Authors: Yann Zerlaut^{1,2}*, Stefano Zucca^{1,3}, Tommaso Fellin^{1,3}* and Stefano Panzeri^{1,2}*
-Short Authors: Zerlaut, Zucca, Fellin \& Panzeri
+Correspondence: Y.Z. ([[yann.zerlaut@iit.it]]), S.P. ([[stefano.panzeri@iit.it]]), T.F. ([[tommaso.fellin@iit.it]])
+Authors: Yann Zerlaut^{1,2}*, Stefano Zucca^{1,3}, Stefano Panzeri^{1,2}* and Tommaso Fellin^{1,3}*
+Short Authors: Zerlaut, Zucca, Panzeri \& Fellin
 
 
 * Abstract
 
 The processing of sensory input in awake animals lies on top of strong behaviorally-relevant modulations in the collective dynamics of cortical networks. Understanding cortical function during wakefulness would therefore largely benefit from a measure of network states relying on the most commonly acquired electrophysiological signal: the extracellular potential. We introduce here a Network State Index (NSI) giving a quantitative formulation to the “U-model" of arousal in sensory cortices from this population signal. We use simultaneous extracellular and intracellular recordings in the somato-sensory cortex of awake mice to design and calibrate a method gradually classifying network states from low frequency (2-10Hz) activity to asynchronous activity at various spiking activity levels. We use this measure to analyze the link between single-cell (intracellular) and population (extracellular) signals over the different network regimes of wakefulness. We find that the graded levels of population signal during non-rhythmic activity is faithfully translated into the single cell depolarization levels. On the other hand, the graded levels of rhythmic population signals translate in a rather stereotypical oscillatory pattern of membrane potential. Finally, we show that the variability of network states, beyond the occurrence of slow synchronous activity, critically contribute to the average correlations between single cell and population signals in neocortex.
 
+*** Significance Statement
+
+Sensation during wakefulness is strongly modulated by the behavioral and physiological state of the animal. Such a context-dependent modulation of sensory processing is thought to be mediated by a top-down control of network states in sensory cortices, where different network states have been shown to display diverse computational properties. So far, those network states have been only characterized from intracellular recordings thanks to their high signal-to-noise ratio. Here, we introduce a signal processing pipeline that enable the classification of cortical states in the surrounding network from extracellular signals. Given the widespread use of extracellular recordings in neuroscientific research, the present characterization might turn out a critical methodological advance to unveil the mechanisms and functions of state-dependent computations in neocortex.
+
+
 * Introduction
 
-During wakefulness, epochs corresponding to various levels of physiological and behavioral markers (such as pupil size, whisking, locomotion, hippocampal ripples rate, ...) have been correlated with various membrane potential ($V_m$) signatures in rodent cortices (Constantinople and Bruno, 2011; Einstein et al., 2017; Poulet and Petersen, 2008; Okun et al., 2010; Polack et al., 2013; McGinley et al., 2015a; Reimer et al., 2014; Schneider et al., 2014). Those observations evidenced the existence of various network states during wakefulness (McGinley et al., 2015b; Busse et al., 2017). An emergent conceptual picture for the modulation of network activity in sensory cortices is the "U-model" of arousal (McGinley et al., 2015b): a continuum of network states including three well-identified patterns of $V_m$ fluctuations. At low arousal levels (quantified by a low pupil diameter and the absence of motor behavior), the membrane potential fluctuations exhibit a stereotypical [2,10]Hz oscillatory pattern (Crochet and Petersen, 2006; Poulet and Petersen, 2008; McGinley et al., 2015a; Reimer et al., 2014). At moderate arousal (quantified by an intermediate pupil diameter), single cells are hyperpolarized and display low amplitude $V_m$ fluctuations (McGinley et al., 2015a; Reimer et al., 2014). At high arousal levels (under motor behavior or and/or high pupil dilatation), the membrane potential exhibits a sustained depolarization with high-frequency $V_m$ fluctuations and high firing activity (Crochet and Petersen, 2006; Poulet and Petersen, 2008; Polack et al., 2013; McGinley et al., 2015a; Reimer et al., 2014; Vinck et al., 2015). What is the correlate of such network states in terms of extracellular potential in neocortex? How does the $V_m$-defined graded aspect of this diversity of states translate into extracellular signals ? Can one derive a robust classification of for network states from the extracellular potential ? By combining intra- and extracellular recordings in awake mice somato-sensory cortex, we addressed those questions in the present study.
-
-# In the present study, we combined intra- and extracellular recordings in awake mice somato-sensory cortex to analyze how this diversity of network states (measured in terms of $V_m$ fluctuations) translate into extracellular signals. We introduced a Network State Index (NSI) and, using such a measure, we found that the fluctuations of the extracellular high-gamma power enabled a robust classification of network states mapping the predictions of intracellular signals. We finally analyzed how the distribution of network states within a recording period shaped the average correlations between the single cell (intracellular) and population (extracellular) signals. We found that the variability of network states, beyond the occurrence of slow synchronous activity, is the main factor shaping the average correlations between single cell and population signals in neocortex.
+During wakefulness, epochs corresponding to various levels of physiological and behavioral markers (such as pupil diameter, whisking activity, locomotion speed or the hippocampal ripples rate) have been correlated with various membrane potential ($V_m$) signatures in rodent cortices (Bennett et al., 2013; Constantinople and Bruno, 2011; Crochet and Petersen, 2006; Einstein et al., 2017; Poulet and Petersen, 2008; Okun et al., 2010; Polack et al., 2013; McGinley et al., 2015a; Reimer et al., 2014; Schiemann et al., 2015; Schneider et al., 2014). Such observations evidenced the existence of various cortical states during wakefulness. An emergent conceptual picture for the modulation of network activity in sensory cortices is the "U-model" of arousal (McGinley et al., 2015b): a continuum of network states including three well-identified patterns of $V_m$ fluctuations. At low arousal levels (quantified by a low pupil diameter and the absence of motor behavior), the membrane potential fluctuations exhibit a stereotypical [2,10]Hz oscillatory pattern. At moderate arousal (quantified by an intermediate pupil diameter), single cells are hyperpolarized and display low amplitude $V_m$ fluctuations. At high arousal levels (under motor behavior or and/or high pupil dilatation), the membrane potential exhibits a sustained depolarization with high-frequency $V_m$ fluctuations and high firing activity. What is the correlate of such network states in terms of extracellular potential in neocortex? How does the $V_m$-defined graded aspect of this diversity of states translate into extracellular signals ? Can one derive a robust classification of for network states from the extracellular potential ? By combining intra- and extracellular recordings in awake mice somato-sensory cortex, we addressed those questions in the present study.
 
 * Materials and Methods
 
@@ -24,7 +27,7 @@ Experimental procedures involving animals have been approved by the IIT Animal W
 
 *** Simultaneous extra- and intracellular recordings in awake mice
 
-The experimental procedure for in vivo electrophysiological recordings in awake head-fixed mice have been previously described (Zucca et al., 2017). Briefly, custom metal plate were fixed on young (P22-P24) mice skull two weeks before the experimental sessions. After a 2-3 days recovery period, mice were habituated to sit quietly on the experimental setup for at least 7-10 days (one session per day and gradually increasing session duration). The day of the experiment, mice were anesthetized with 2.5\% isofluorane and a small craniotomy (0.5x0.5 mm) was opened over the somatosensory cortex and a 30 minutes long recovery period was provided to the animal before starting the recordings. Brain surface was kept moist with a HEPES-buffered artificial cerebrospinal fluid (aCSF). Extracellular recordings were performed by lowering a glass pipette filled with aCSF into the tissue with the deeper tip placed at $\sim$300 mm from pial surface. Simultaneous current-clamp patch-clamp recordings were carried out on superficial pyramidal neurons (100– 350 mm). 3–6 M$\Omega$ borosilicate glass pipettes (Hilgenberg, Malsfeld, Germany) were filled with an internal solution containing (in mM): K-gluconate 140, MgCl2 1, NaCl 8, Na2ATP 2, Na3GTP 0.5, HEPES 10, Tris-phosphocreatine 10 to pH 7.2 with KOH. Electrical signals were acquired using a Multiclamp 700B amplifier, filtered at 10 kHz, digitized at 50 kHz with a Digidata 1440 and stored with pClamp 10 (RRID:SCR\_011323, Axon Instruments, Union City, CA). 
+The experimental procedure for in vivo electrophysiological recordings in awake head-fixed mice have been previously described (Zucca et al., 2017). Briefly, custom metal plate were fixed on young (P22-P24) mice skull two weeks before the experimental sessions. After a 2-3 days recovery period, mice were habituated to sit quietly on the experimental setup for at least 7-10 days (one session per day and gradually increasing session duration). The day of the experiment, mice were anesthetized with 2.5\% isofluorane and a small craniotomy (0.5x0.5 mm) was opened over the somatosensory cortex and a 30 minutes long recovery period was provided to the animal before starting the recordings. Brain surface was kept moist with a HEPES-buffered artificial cerebrospinal fluid (aCSF). Extracellular recordings were performed by lowering a glass pipette filled with aCSF into the tissue with the deeper tip placed at $\sim$300 mm from pial surface. Simultaneous current-clamp patch-clamp recordings were carried out on superficial pyramidal neurons (100– 350 mm). 3–6 M$\Omega$ borosilicate glass pipettes (Hilgenberg, Malsfeld, Germany) were filled with an internal solution containing (in mM): K-gluconate 140, MgCl2 1, NaCl 8, Na2ATP 2, Na3GTP 0.5, HEPES 10, Tris-phosphocreatine 10 to pH 7.2 with KOH. Electrical signals were acquired using a Multiclamp 700B amplifier, filtered at 10 kHz, digitized at 50 kHz with a Digidata 1440 and stored with pClamp 10 (Axon Instruments, Union City, CA). 
 
 *** Wavelet Transform
 
@@ -79,7 +82,7 @@ The signal processing steps of this procedure are illustrated on Figure {NSI}a a
 
 *** Data Analysis and Statistics
 
-Data were analyzed with \texttt{SciPy} (Oliphant, 2007). The signal processing steps (filtering, convolution, subsampling, ...) were implemented in \texttt{numpy}. Statistics was performed with the \texttt{scipy.stats} module (t-tests, Pearson correlations). Multiple linear regressions were performed with the \texttt{OLS} (ordinary least squares) function of the \texttt{statsmodel} module. Experimental data were translated to Python using the \texttt{neo} module (Garcia et al., 2014, RRID:SCR\_000634). 
+Data were analyzed with \texttt{SciPy} (Oliphant, 2007). The signal processing steps (filtering, convolution, subsampling, ...) were implemented in \texttt{numpy}. Statistics was performed with the \texttt{scipy.stats} module (t-tests, Pearson correlations). Multiple linear regressions were performed with the \texttt{OLS} (ordinary least squares) function of the \texttt{statsmodel} module. Experimental data were translated to Python using the \texttt{neo} module (Garcia et al., 2014). 
 
 *** Software implementation
 
@@ -124,22 +127,28 @@ We implemented the described analysis into a publicly available software, see \u
 
 *** The time-varying high-gamma power of the extracellular potential exhibits a high correlation with the membrane potential of pyramidal neurons in awake mice S1. 
 
-So far, the different waking states in rodent sensory cortices have been evidenced from their membrane potential signature (McGinley et al., 2015b) while the analysis of the extracellular potential have been restricted to evidence the presence of slow oscillatory activity (Crochet and Petersen, 2006; Poulet and Petersen, 2008; Pala and Petersen, 2018). To take advantage of this existing classification, we looked for a transformation of the extracellular signal $V_{ext}$ that would display temporal fluctuations qualitatively similar to those of the membrane potential $V_m$. 
+So far, the different waking states in rodent sensory cortices have been evidenced from their membrane potential signature (Arroyo et al., 2018; Einstein et al., 2017; McGinley et al., 2015a; Polack et al., 2013; Poulet and Petersen, 2008; Reimer et al., 2014) while previous analysis of the extracellular potential has been restricted to evidence the presence of slow oscillatory activity (Chen et al., 2017; Pala and Petersen, 2018; Vinck et al., 2015). To take advantage of the existing classification of network state in terms of $V_m$ signal, we looked for a transformation of the extracellular signal $V_{ext}$ that would display temporal fluctuations qualitatively similar to those of the membrane potential $V_m$. 
 
-A first candidate quantity that ressembles the $V_m$ fluctuations is the extracellular potential itself. The negatively-weighted extracellular potential fluctuations can indeed display high correlation values with the membrane potential in awake animals (cc$\sim$0.6, Poulet and Petersen, 2008). The extracellular signal is however also subjected to drifts at short (<10s) time scales (e.g. see the drift at the $\sim$5s time scale between episodes (i) and (ii) in Figure {pLFP}a) as well as slow (>1min) drifts over long recordings. Its absolute value therefore does not seem to provide a reliable quantity on which one can rely to perform a robust classification. 
+A first candidate quantity that ressembles the $V_m$ fluctuations is the extracellular potential itself. The negatively-weighted extracellular potential fluctuations can indeed display high correlation values (cc$\sim$0.5) with the membrane potential in awake animals (Poulet and Petersen, 2008; Arroyo et al., 2018). However, the amplitude of the extracellular signal is strongly dependent on the specific depth of the recording (Kajikawa and Schroeder, 2011; Herreras et al., 2015; Lindén et al., 2011; Sakata and Harris, 2009; Smith et al., 2012) and is also subjected to drifts both at short time scales (<10s, see the example drift at the $\sim$5s time scale between episodes (i) and (ii) in Figure {pLFP}a) together with slow drifts over long recordings (>1min). Those factors limit the similarity between $V_m$ and $V_{ext}$ and were shown to impede a robust classification of network state during slow wave (<1Hz) activity from the absolute value of $V_{ext}$ (Mukovski et al., 2006).
 
-Guided by findings under anesthesia (Mukovski et al., 2006), we hypothesized that the high-frequency content ($f$>40Hz) of the extracellular recording would provide a good predictor of the depolarization level. We therefore apply a wavelet transform to the extracellular signal and looked for the frequency band maximizing the cross-correlation with the membrane potential of a simultaneously recorded cell (see Figure {pLFP}b). We found that the optimal band was achieved for $f_{opt}$={f0}Hz and $w_{opt}$={w0}, i.e. the [{F_band_min},{F_band_max}]Hz band. A temporal smoothing was found to improve the similarity with the $V_m$ signal, the optimal value was found to be $T_{opt}$={Tsmooth}ms. We refer in the following to such smoothed high-gamma power as the "pLFP" (processed Local Field Potential, in analogy with the terminology of Mukovski et al. (2006)) and we interpret this quantity as the time-varying recruitment of local spiking activity in the near cortical network surrounding the extracellular electrode (Buzsáki et al., 2012, Einevoll et al., 2013).
+Guided by the previous findings in anesthetized animals (Mukovski et al., 2006), we hypothesized that the high-frequency content ($f$>40Hz) of the extracellular recording would provide a good predictor of the depolarization level $V_m$. We therefore apply a wavelet transform to the extracellular signal and looked for the frequency band maximizing the cross-correlation with the membrane potential of a simultaneously recorded cell (see Figure {pLFP}b). We found that the optimal band was achieved for $f_{opt}$={f0}Hz and $w_{opt}$={w0}, i.e. the [{F_band_min},{F_band_max}]Hz band. A temporal smoothing was found to improve the similarity with the $V_m$ signal, the optimal value was found to be $T_{opt}$={Tsmooth}ms. We refer in the following to such
+smoothed high-gamma power as the "pLFP" (processed Local Field Potential, in analogy with the terminology of Mukovski et al. (2006))
+and we interpret this quantity as the time-varying recruitment of
+local spiking activity in the near cortical network surrounding the
+extracellular electrode (Buzsáki et al., 2012; Gaucher et al., 2012;
+Katzner et al., 2009; Lindén et al., 2011; Mazzoni et al., 2011;
+Einevoll et al., 2013).
 
-After this transformation of the extracellular signal, we found a qualitative match between the previously evidenced $V_m$ signatures of network states and the signatures in terms of pLFP signal. We highlight this feature on a single cell recording in Figure {NSI}a. We observed rhythmic activity at different power (episodes 1,2) as well as non-rhythmic fluctuations at various mean levels of pLFP signal (episodes 3-6), i.e. patterns of activity sampling the continuum of network states found in rodent sensory cortices during wakefulness (McGinley et al., 2015b). This apparent similarity was more thoroughly investigated in the next sections.
+After this transformation of the extracellular signal, we found a qualitative match between the previously evidenced $V_m$ signatures of network states and the signatures in terms of pLFP signal. We highlight this feature on a single cell recording in Figure {NSI}a. We observed rhythmic activity at different power (episodes 1,2) as well as non-rhythmic fluctuations at various mean levels of pLFP signal (episodes 3-6), i.e. patterns of activity sampling the continuum of network states found in rodent sensory cortices during wakefulness (McGinley et al., 2015b). This similarity was more thoroughly investigated in the next sections.
 
 *** FIGURE: The Network State Index (NSI). We define a graded measure of network states based on the mean level (for non-rhythmic activity) or the low frequency power (for rhythmic activity) of the time-varying pLFP signal.
 #+options : {'label':'NSI', 'extent': 'doublecolumn'}
-(a) Example samples of activity at different NSI levels (bottom) with their corresponding $V_m$ (top) and pLFP (middle) fluctuations. In episodes (1,2) the pLFP and $V_m$ signals exhibit low frequency activity at different powers. In episodes (3-6) the pLFP and $V_m$ signals exhibit non-rhythmic activity at various levels (in terms of both pLFP and depolarization levels). Two time-varying quantities derived from the pLFP signal are used to classify network states: a weighted estimate of the low frequency content of the pLFP signal $X(t)$ (purple dashed line) and the pLFP sliding mean $Y(t)$ (brown dashed line). A consistency criterion validates a fraction of those as "validated" network states (brown dots). (b) A long recording sample (3 min) with the simultaneous variations of $V_{ext}$ (top), $V_m$ (middle) and NSI (bottom). We indicate where the (numbered) samples shown in *a* have been extracted. (c) Fraction of rhythmic, non-rhythmic and unclassified States as a function of the parameter $\alpha$ (weighting the propensity to classify as rhythmic states). (d) $V_m$ power of the [2,10]Hz band averaged across all identified rhythmic states for different values of the parameter $\alpha$. We fit the decay with an exponential function (dashed red line) and take its decay parameter as the optimal value for the classification. (e) $V_m$ power of the [2,10]Hz band in the samples (evaluated in 500ms time windows) averaged across all identified rhythmic states (purple bar) and non-rhythmic states (kaki bar) from the pLFP signal. (f) Mean depolarization level over all identified rhythmic states (purple color) and all non-rhythmic states (kaki color) at various phase of the [2,10]Hz fluctuations in the pLFP signal (see Methods).
+(a) Example samples of activity at different NSI levels (bottom) with their corresponding $V_m$ (top) and pLFP (middle) fluctuations. In episodes (1,2) the pLFP and $V_m$ signals exhibit low frequency activity at different powers. In episodes (3-6) the pLFP and $V_m$ signals exhibit non-rhythmic activity at various levels (in terms of both pLFP and depolarization levels). Two time-varying quantities derived from the pLFP signal are used to classify network states: a weighted estimate of the low frequency content of the pLFP signal $X(t)$ (purple dashed line) and the pLFP sliding mean $Y(t)$ (brown dashed line). A consistency criterion validates a fraction of those as "validated" network states (brown dots). (b) A long recording sample (3 min) with the simultaneous variations of $V_{ext}$ (top), $V_m$ (middle) and NSI (bottom). We indicate where the (numbered) samples shown in *a* have been extracted. (c) Fraction of rhythmic, non-rhythmic and unclassified states as a function of the parameter $\alpha$ (weighting the propensity to classify as rhythmic states). (d) $V_m$ power of the [2,10]Hz band averaged across all identified rhythmic states for different values of the parameter $\alpha$. We fit the decay with an exponential function (dashed red line) and take its decay parameter as the optimal value for the classification. (e) $V_m$ power of the [2,10]Hz band in the samples (evaluated in 500ms time windows) averaged across all identified rhythmic states (purple bar) and non-rhythmic states (kaki bar) from the pLFP signal. (f) Mean depolarization level over all identified rhythmic states (purple color) and all non-rhythmic states (kaki color) at various phase of the [2,10]Hz fluctuations in the pLFP signal (see Methods).
 [[./Figures/Fig_NSI_design.png]]
 
 *** Designing a Network State Index (NSI)
 
-To analyze the occurence of specific network states of wakefulness, we develloped an algorithm classifying patterns of neural activity and mapping them on an arbitrary axis: the Network State Index (NSI). We describe in the following the signal processing step to achieve such a classification. We illustrate this procedure on the time-varying fluctuations of the pLFP signal. 
+To analyze the occurence of specific network states of wakefulness, we develloped an algorithm classifying patterns of neural activity and mapping them on an arbitrary axis: the Network State Index (NSI). We describe in the following the signal processing step to achieve such a classification. We illustrate this procedure on the time-varying fluctuations of the pLFP signal (Figure {NSI}). 
 
 We first compute the time-varying mean $Y(t)$ of the fluctuations over a long time scale ($T_{mean}$={T_sliding_mean}ms). We also compute the low frequency power of the fluctuations $Pow^{max}_{[2,10]Hz}$ (we take the maximum to account for the fact that rhythmicity can have varying frequencies in the [2,10]Hz band) using a wavelet transform (see Methods). From this last time-varying signal, we define a weighted estimate of the contribution of the slow rhythm to the full signal $X(t) = p_0 + \alpha Pow^{max}_{[2,10]Hz}$ (shown on Figure {pLFP}a together with $Y$). By comparing this estimate with the sliding mean, we classify as "rhythmic" or "non-rhythmic" by computing the sign of the difference: when Y(t)-X(t) is negative, activity is classified as rhythmic, when Y(t)-X(t) is positive, activity is classified as non-rhythmic. To keep the graded aspects of the different network states in our index, we now weight this binary quantity by the amplitude of the pLFP signal in the two regimes. For the rhythmic states the amplitude of the fluctuations is given by $2 \cdot Pow^{max}_{[2,10]Hz}$. For the non-rhythmic states, the amplitude of activity is given by its deviation from the baseline level, i.e. $(Y-p_0)$. Mathematically, this corresponds to a Network State Index (NSI) signal given by Equation {NSI} (see Methods).
 
@@ -154,8 +163,6 @@ Note that this classification relies on the difference between the average pLFP 
 The parameter $\alpha$ weights the propensity to classify the network activity as rhythmic. This is visible on Figure {NSI}c, when raising the $\alpha$ parameter, the proportion of rhythmic states gradually increase from $\sim$0\% at $\alpha<1$ to $\sim$100\% at $\alpha$>6. This parameter can therefore be adjusted with respect to the specific context in which the NSI is used (see Discussion). 
 
 We nonetheless asked whether our dataset could give us an indication of the optimal value for this parameter. We used our simultaneous $V_m$ recording to find such a value. In Figure {NSI}d, we show the mean [2,10]Hz power of the membrane potential $V_m$ as a function of the $\alpha$ parameter (after averaging over all episodes classified as rhythmic for a given cell, computed for all n={Ncells} cells). The low frequency $V_m$ power exhibits a clear exponential decay. A natural parameter that insures a consistency between the slow-rhythmicity in the $V_m$ and in the pLFP is therefore provided by the decay constant of this decrease. We fitted this parameter and found it to be $\alpha^{opt}$={alpha_opt}. For such a value, we found a strong decrease in $V_m$ power from rhythmic to non-rhythmic states after (pLFP-based) NSI classification for all cells (paired t-test, p={pvalue_decrease_in_slow_power_Vm_synch_to_asynch}, n={Ncells} cells, see Figure {NSI}e). Similarly, for such a value, the $V_m$ fluctuations of rhythmic episodes exhibited a clear oscillatory pattern after averaging with respect to the phase of the pLFP signal (see Figure {NSI}f) while the pLFP phase has a much weaker impact in the non-rhythmic episodes. The rhythmic episodes displayed a mean hyperpolarization of {mean_depol_from_0_to_pi_synch}mV from the 0-phase to the $\pi$-phase of the pLFP signal while the non-rhythmic episodes displayed an hyperpolarization of {mean_depol_from_0_to_pi_asynch}mV (see Figure {NSI}f). Given the high variability of the depolarization at the single cycle level in both cases, {std_depol_from_0_to_pi_synch}mV for rhythmic episodes and {std_depol_from_0_to_pi_asynch}mV for non-rhythmic episodes (variability of the hyperpolarization level over all cycles), only the rhythmic activity exhibits a high reliability of single cycle depolarization (as quantified by the mean-to-variability ratios across cycles: {mean_to_var_depol_from_0_to_pi_synch} for rhythmic states compared to {mean_to_var_depol_from_0_to_pi_asynch} for non-rhythmic states, p={pval_mean_to_var_depol_from_0_to_pi}, n={Ncells} cells, paired t-test).
-
-It could also be hypothesized that the most accurate classification is the most conservative one, i.e. the one that maximizes the proportion of "unclassified" states. Interestingly, one can see on Figure {NSI}c that such value is achieved for $\alpha$={alpha_opt_of_max_unclassified} (thin grey dashed line), i.e. close to the $\alpha^{opt}$={alpha_opt} estimate (thin purple dashed line, where the proportion of unclassified states reaches {fraction_unclassified_for_alpha_opt}\% of its maximal value) obtained with the above procedure.
 
 *** FIGURE: The NSI measure across multiple recordings: variability and estimated accuracy. Showing 8 cells covering the whole range of observed correlations between $V_m$ and the pLFP signal.
 #+options : {'label':'All', 'extent': 'doublecolumn'}
@@ -220,38 +227,73 @@ We conclude that, in the present dataset, the average correlation between a sing
 
 * Discussion
 
-# that beyond the occurrence of slow synchronous activity, critically contribute to the average correlations between single cell and population signals in neocortex.  strongly correlates with the $V_m$ fluctuations and allow the design of a robust classification  we designed a classification  . From this processed LFP, we derive 
-
-In the present study, we derived a characterization of waking states relying on extracellular signals. We introduced a quantitative measure in terms of neurophysiological signal for the "U-model" of arousal (McGinley et al., 2015b): the Network State Index (NSI). We showed that such a measure was applicable to both the intracellular potential of a pyramidal cell as well as to the high-gamma power of the extracellular potential (pLFP). Those results extend the findings of Mukovski et al. (2007). In that study, the authors were able to identity active and silent states (Up and Down respectively) under anesthesia from the pLFP signal (with a slightly different frequency band of the LFP: 20-100 Hz, instead of the data-driven [{F_band_min},{F_band_max}]Hz band here). Here, we show that such procedures also captures the various states of wakefulness: a graded level of regimes ranging from slow (2-10 Hz) oscillatory activity to desynchronized states at various levels of spiking activity. We used this characterization to analyze how the distribution of network states within a recording period shaped the average correlations between the single cell (intracellular) and population (extracellular) signals. We found that the variability of network states, beyond the occurrence of slow synchronous activity, is the main factor shaping the average correlations between single cell and population signals in neocortex.
+In the present study, we derived a characterization of waking states relying on extracellular signals. We introduced a quantitative measure in terms of neurophysiological signal for the "U-model" of arousal (McGinley et al., 2015b): the Network State Index (NSI). We showed that such a measure was applicable to both the intracellular potential of a pyramidal cell as well as to the high-gamma power of the extracellular potential (pLFP). Those results extend the findings of Mukovski et al. (2007). In that study, the authors were able to identity active and silent states (Up and Down respectively) under anesthesia from the pLFP signal (with a slightly different frequency band of the LFP: 20-100 Hz, instead of the data-driven [{F_band_min},{F_band_max}]Hz band here). Here, we show that such a signal processing step enables to capture the various states of wakefulness: a graded level of regimes ranging from slow (2-10 Hz) oscillatory activity to desynchronized states at various levels of spiking activity. We used this characterization to analyze how the distribution of network states within a recording period shaped the average correlations between the single cell (intracellular) and population (extracellular) signals. We found that the variability of network states, beyond the occurrence of slow synchronous activity, is the main factor shaping the average correlations between single cell and population signals in neocortex.
 
 Importantly, although we provide optimal parameters based on the cross-validation with the $V_m$ fluctuations (see Table {params}), the present classification is flexible and can be adjusted to the specific context in which the NSI is used. For example, the $\alpha$ parameter is the critical parameter separating rhythmic and non-rhythmic fluctuations. If an investigation focuses on slow rhythmic activity, one should be rather conservative in its determination and a low $\alpha$ parameter could be preferred (e.g. $\alpha$=2). On the other hand if an investigation focuses on asynchronous dynamics (non-rhythmic states), a higher $\alpha$ would be a conservative value (e.g. $\alpha$>3).
 
-Interpreting the pLFP signal (the high-gamma power of the extracellular recording) as the amount of spiking activity within the local network surrounding the electrode (Buzsáki et al., 2012; Einevoll et al., 2013; Ray et al., 2008; Ray and Maunsell, 2011), the present results provide important insights on the neurophysiogical basis of the different regimes of wakefulness. First, this analysis provides a hierarchy in the synaptic recruitment of the different regimes. For example, some non-rhythmic epochs correspond to very high pLFP levels (e.g. episode 6 in Figure {NSI}a) and such levels are never achieved under rhythmic conditions. Overall, the rhythmic epochs have synaptic activity levels lying in-between the very low and very high levels of the non-rhythmic periods. Second, the steep and robust relationship between the pLFP level and single cell depolarization suggests a critical involvment of the local spiking activity during non-rhythmic regimes. On the other hand, the weaker relationship found during rhythmic epochs suggest that the rhythmic pattern has a weaker dependency on the local spiking activity.
+Interpreting the pLFP signal (the high-gamma power of the extracellular recording) as the amount of spiking activity within the local network surrounding the electrode (Buzsáki et al., 2012; Einevoll et al., 2013; Katzner et al., 2009; Ray et al., 2008; Ray and Maunsell, 2011), the present results provide important insights on the neurophysiogical basis of the different regimes of wakefulness. First, this analysis provides a hierarchy in the synaptic recruitment of the different regimes. For example, some non-rhythmic epochs correspond to very high pLFP levels (e.g. episode 6 in Figure {NSI}a) and such levels are never achieved under rhythmic conditions. Overall, the rhythmic epochs have synaptic activity levels lying in-between the very low and very high levels of the non-rhythmic periods. Second, the steep and robust relationship between the pLFP level and single cell depolarization suggests a critical involvment of the local spiking activity during non-rhythmic regimes. On the other hand, the weaker relationship found during rhythmic epochs suggest that the rhythmic pattern has a weaker dependency on the local spiking activity.
 
-This last phenomenon was also found to be at the origin of the main limitation of the present characterization. Because of the occasionally low level of the pLFP signal during rhythmic activity, the NSI exhibits a bias toward low activity non-rhythmic states when evaluated from extracellular recordings (characterized from the $V_m$ recording). However, despite those limitations, the overall high matching value obtained through cross-validation ($\sim$80\% correct) suggests that the NSI is a valid index to characterize the various network states of wakefulness. Given the widespread use of extracellular recordings in neuroscientific research (Panzeri et al., 2015), the present characterization might turn out an important methodological advance to unveil the mechanisms and functions of state-dependent computations in neocortex.
+This last phenomenon was also found to be at the origin of the main limitation of the present characterization. Because of the occasionally low level of the pLFP signal during rhythmic activity, the NSI exhibits a bias toward low activity non-rhythmic states when evaluated from extracellular recordings (characterized from the $V_m$ recording). However, despite those limitations, the overall high matching value obtained through cross-validation ($\sim$80\% correct) suggests that the NSI is a valid index to characterize the various network states of wakefulness. 
 
-# This rather suggests that, to some degree, this pattern would be externally generated or would involve a low number of synaptic connections in the local network. 
-# Rhytmicity might emerge from intrinsic pacemaker-like conductances in a few cells targeting the local network
-
-# Importantly, this increased statistical dependency demonstrates that not only the occurence of the rhythmic activity explains the correlation between the $V_m$ and the pLFP, but more generally the variability in network states (i.e. also the variability in non-rhythmic states). 
+Given the widespread use of extracellular recordings in
+neuroscientific research (Panzeri et al., 2015) and the relevance of
+state modulation in sensory processing (Ayaz et al., 2013; Busse et
+al., 2017; Bennett et al., 2013; Dadarlat and Stryker, 2017; Destexhe,
+2011; Ecker et al., 2014; Einstein et al., 2017; Fu et al., 2014; Lee
+et al., 2014; McGinley et al., 2015a; Niell and Stryker, 2010;
+Pachitariu et al., 2015; Pakan et al., 2016; Pinto et al., 2013;
+Polack et al., 2013; Reimer et al., 2014; Vinck et al., 2015; Zhou et
+al., 2014), the present characterization might turn out an important
+methodological advance to unveil the mechanisms and functions of
+state-dependent computations in neocortex.
 
 * References
 
+[[Arroyo et al., 2018]] Arroyo, S., Bennett, C., & Hestrin, S. (2018). Correlation of Synaptic Inputs in the Visual Cortex of Awake, Behaving Mice. Neuron, 99(6), 1289-1301.
+
+[[Ayaz et al., 2013]] Ayaz, A., Saleem, A. B., Schölvinck, M. L., and Carandini, M. (2013). Locomotion controls spatial integration in mouse visual cortex. Current Biology, 23(10), 890-894.
+
 [[Busse et al., 2017]] Busse, L., Cardin, J. A., Chiappe, M. E., Halassa, M. M., McGinley, M. J., Yamashita, T., and Saleem, A. B. (2017). Sensation during active behaviors. Journal of Neuroscience, 37(45), 10826-10834.
 
+[[Bennett et al., 2013]] Bennett, C., Arroyo, S., and Hestrin, S. (2013). Subthreshold mechanisms underlying state-dependent modulation of visual responses. Neuron, 80(2), 350-357.
+
 [[Buzsáki et al., 2012]] Buzsáki, G., Anastassiou, C. A., and Koch, C. (2012). The origin of extracellular fields and currents—EEG, ECoG, LFP and spikes. Nature reviews neuroscience, 13(6), 407.
+
+[[Chen et al., 2017]] Chen, G., Zhang, Y., Li, X., Zhao, X., Ye, Q., Lin, Y., Tao, H.W., Rasch, M.J. and Zhang, X. (2017). Distinct inhibitory circuits orchestrate cortical beta and gamma band oscillations. Neuron, 96(6), 1403-1418.
 
 [[Crochet and Petersen, 2006]] Crochet, S., and Petersen, C.C.H. (2006). Correlating whisker behavior with membrane potential in barrel cortex of awake mice. Nat. Neurosci. 9, 608–610.
 
 [[Constantinople and Bruno, 2011]] Constantinople, C. M., and Bruno, R. M. (2011). Effects and mechanisms of wakefulness on local cortical networks. Neuron, 69(6), 1061-1068.
 
+[[Dadarlat and Stryker, 2017]] Dadarlat, M. C., and Stryker, M. P. (2017). Locomotion enhances neural encoding of visual stimuli in mouse V1. Journal of Neuroscience, 2728-16.
+
+[[Destexhe, 2011]] Destexhe, A. (2011). Intracellular and computational evidence for a dominant role of internal network activity in cortical computations. Current opinion in neurobiology, 21(5), 717-725.
+
+[[Ecker et al., 2014]] Ecker, A.S., Berens, P., Cotton, R.J., Subramaniyan, M., Denfield, G.H., Cadwell, C.R., Smirnakis, S.M., Bethge, M. and Tolias, A.S. (2014). State dependence of noise correlations in macaque primary visual cortex. Neuron, 82(1), 235-248.
+
 [[Einevoll et al., 2013]] Einevoll, G. T., Kayser, C., Logothetis, N. K., and Panzeri, S. (2013). Modelling and analysis of local field potentials for studying the function of cortical circuits. Nature Reviews Neuroscience, 14(11), 770.
 
 [[Einstein et al., 2017]] Einstein, M. C., Polack, P. O., Tran, D. T., and Golshani, P. (2017). Visually-evoked 3-5 Hz membrane potential oscillations reduce the responsiveness of visual cortex neurons in awake behaving mice. Journal of Neuroscience, 3868-16.
 
+[[Fu et al., 2014]] Fu, Y., Tucciarone, J. M., Espinosa, J. S., Sheng, N., Darcy, D. P., Nicoll, R. A., ... and Stryker, M. P. (2014). A cortical circuit for gain control by behavioral state. Cell, 156(6), 1139-1152.
+
 [[Garcia et al., 2014]] Garcia S., Guarino D., Jaillet F., Jennings T.R., Pröpper R., Rautenberg P.L., Rodgers C., Sobolev A.,Wachtler T., Yger P. and Davison A.P. (2014) Neo: an object model for handling electrophysiology data in multiple formats. Frontiers in Neuroinformatics 8:10: doi:10.3389/fninf.2014.00010
 
+[[Gaucher et al., 2012]] Gaucher, Q., Edeline, J. M., and Gourévitch, B. (2012). How different are the local field potentials and spiking activities? Insights from multi-electrodes arrays. Journal of Physiology-Paris, 106(3-4), 93-103.
+
+[[Herreras et al., 2015]] Herreras, O., Makarova, J., and Makarov, V. A. (2015). New uses of LFPs: Pathway-specific threads obtained through spatial discrimination. Neuroscience, 310, 486-503.
+
+[[Kajikawa and Schroeder, 2011]] Kajikawa, Y., and Schroeder, C. E. (2011). How local is the local field potential?. Neuron, 72(5), 847-858.
+
+[[Katzner et al., 2009]] Katzner, S., Nauhaus, I., Benucci, A., Bonin, V., Ringach, D. L., and Carandini, M. (2009). Local origin of field potentials in visual cortex. Neuron, 61(1), 35-41.
+
 [[Haider et al., 2016]] Haider, B., Schulz, D. P., Hausser, M., and Carandini, M. "Millisecond Coupling of Local Field Potentials to Synaptic Currents in the Awake Visual Cortex." Neuron 90(1): 35-42.
+
+[[Lindén et al., 2011]] Lindén, H., Tetzlaff, T., Potjans, T. C., Pettersen, K. H., Grün, S., Diesmann, M., and Einevoll, G. T. (2011). Modeling the spatial reach of the LFP. Neuron, 72(5), 859-872.
+
+[[Lee et al., 2014]] Lee, A. M., Hoy, J. L., Bonci, A., Wilbrecht, L., Stryker, M. P., and Niell, C. M. (2014). Identification of a brainstem circuit regulating visual cortical state in parallel with locomotion. Neuron, 83(2), 455-466.
+
+[[Mazzoni et al., 2011]] Mazzoni, A., Brunel, N., Cavallari, S., Logothetis, N. K., and Panzeri, S. (2011). Cortical dynamics during naturalistic sensory stimulations: experiments and models. Journal of Physiology-Paris, 105(1-3), 2-15.
 
 [[McGinley et al., 2015a]] McGinley, M.J.J., David, S.V. V, and McCormick, D.A.A. (2015). Cortical Membrane Potential Signature of Optimal States for Sensory Signal Detection. Neuron 87, 179–192.
 
@@ -259,13 +301,21 @@ This last phenomenon was also found to be at the origin of the main limitation o
 
 [[Mukovski et al., 2006]] Mukovski, M., Chauvette, S., Timofeev, I., and Volgushev, M. (2006). Detection of active and silent states in neocortical neurons from the field potential signal during slow-wave sleep. Cerebral Cortex, 17(2), 400-414.
 
+[[Niell and Stryker, 2010]] Niell, C. M., and Stryker, M. P. (2010). Modulation of visual responses by behavioral state in mouse visual cortex. Neuron, 65(4), 472-479.
+
 [[Oliphant, 2007]] Oliphant, T.E. (2007). SciPy: Open source scientific tools for Python. Comput. Sci. Eng. 9, 10–20.
 
 [[Okun et al., 2010]] Okun, M., Naim, A., and Lampl, I. (2010). The subthreshold relation between cortical local field potential and neuronal firing unveiled by intracellular recordings in awake rats. Journal of neuroscience, 30(12), 4440-4448.
 
+[[Pachitariu et al., 2015]] Pachitariu, M., Lyamzin, D. R., Sahani, M., and Lesica, N. A. (2015). State-dependent population coding in primary auditory cortex. Journal of Neuroscience, 35(5), 2058-2073.
+
+[[Pakan et al., 2016]] Pakan, J. M., Lowe, S. C., Dylda, E., Keemink, S. W., Currie, S. P., Coutts, C. A., and Rochefort, N. L. (2016). Behavioral-state modulation of inhibition is context-dependent and cell type specific in mouse visual cortex. Elife, 5, e14985.
+
 [[Pala and Petersen, 2018]] Pala, A., and Petersen, C. C. (2018). State-dependent cell-type-specific membrane potential dynamics and unitary synaptic inputs in awake mice. eLife, 7, e35869.
 
 [[Panzeri et al., 2015]] Panzeri, S., Macke, J. H., Gross, J., and Kayser, C. (2015). Neural population coding: combining insights from microscopic and mass signals. Trends in cognitive sciences, 19(3), 162-172.
+
+[[Pinto et al., 2013]] Pinto, L., Goard, M.J., Estandian, D., Xu, M., Kwan, A.C., Lee, S.H., Harrison, T.C., Feng, G. and Dan, Y. (2013). Fast modulation of visual perception by basal forebrain cholinergic neurons. Nature neuroscience, 16(12), 1857.
 
 [[Pérez and Granger, 2007]] Pérez, F., and Granger, B.E. (2007). {IP}ython: a {S}ystem for {I}nteractive {S}cientific {C}omputing. {C}omput. {S}ci. {E}ng. 9, 21–29.
 
@@ -279,9 +329,17 @@ This last phenomenon was also found to be at the origin of the main limitation o
 
 [[Reimer et al., 2014]] Reimer, J., Froudarakis, E., Cadwell, C.R., Yatsenko, D., Denfield, G.H., and Tolias, A.S. (2014). Pupil fluctuations track fast switching of cortical states during quiet wakefulness. Neuron 84, 355–362.
 
+[[Sakata and Harris, 2009]] Sakata, S., and Harris, K. D. (2009). Laminar structure of spontaneous and sensory-evoked population activity in auditory cortex. Neuron, 64(3), 404-418.
+
+[[Schiemann et al., 2015]] Schiemann, J., Puggioni, P., Dacre, J., Pelko, M., Domanski, A., van Rossum, M. C., & Duguid, I. (2015). Cellular mechanisms underlying behavioral state-dependent bidirectional modulation of motor cortex output. Cell reports, 11(8), 1319-1330.
+
 [[Schneider et al., 2014]] Schneider, D. M., Nelson, A., and Mooney, R. (2014). A synaptic and circuit basis for corollary discharge in the auditory cortex. Nature, 513(7517), 189.
 
+[[Smith et al., 2012]] Smith, M. A., Jia, X., Zandvakili, A., and Kohn, A. (2012). Laminar dependence of neuronal correlations in visual cortex. Journal of neurophysiology, 109(4), 940-947.
+
 [[Vinck et al., 2015]] Vinck, M., Batista-Brito, R., Knoblich, U., and Cardin, J.A. (2015). Arousal and Locomotion Make Distinct Contributions to Cortical Activity Patterns and Visual Encoding. Neuron 86, 740–754.
+
+[[Zhou et al., 2014]] Zhou, M., Liang, F., Xiong, X.R., Li, L., Li, H., Xiao, Z., Tao, H.W. and Zhang, L.I. (2014). Scaling down of balanced excitation and inhibition by active behavioral states in auditory cortex. Nature neuroscience, 17(6), 841.
 
 [[Zucca et al., 2017]] Zucca, S., D’Urso, G., Pasquale, V., Vecchia, D., Pica, G., Bovetti, S., Moretti, C., Varani, S., Molano-Mazón, M., Chiappalone, M., et al. (2017). An inhibitory gate for state transition in cortex. Elife 6.
 
@@ -289,43 +347,26 @@ This last phenomenon was also found to be at the origin of the main limitation o
 
 * Notes :noexport:
 
-# to be filled   
-\begin{table}[tb!]
-\small
-\centering
-\begin{tabular}{c|c|c|c}
-~ & \multicolumn{1}{c|}{ \bf Parameter} & {\hfill \bf Symbol \hfill} & \multicolumn{1}{c}{ \bf Value} \\
-\hline
-\multirow{4}{*}{\rotatebox[origin=c]{90}{\parbox[c]{1cm}{\centering \bf fixed }}} 
-                     & \multirow{2}{*}{ \centering pLFP root freq.} 
-                     & \multirow{2}{*}{ \centering $f_0$ } 
-                     & \multirow{2}{*}{ \centering {f0} Hz} \\[-0.1cm]
-&&& \\[-0.1cm]
-& \multirow{2}{*}{\parbox[c]{3.5cm}{\centering pLFP band factor}} 
-                     & \multirow{2}{*}{$w_0$} 
-                     & \multirow{2}{*}{ {w0} } \\[0.1cm]
-&&& \\[-0.1cm]
-& \multirow{2}{*}{\parbox[c]{3.5cm}{\centering factor for rhythmicity threshold}} 
-                     & \multirow{2}{*}{$\alpha$} 
-                     & \multirow{2}{*}{ {alpha_opt} } \\[-0.1cm]
-&&& \\
-\hline
-\multirow{4}{*}{\rotatebox[origin=c]{90}{\parbox[c]{1cm}{\centering \bf data-driven }}} & text &&\\
-& \multirow{2}{*}{\parbox[c]{3.5cm}{pLFP lower bound}} & \multirow{2}{*}{$p_0} & \multirow{2}{*}{ {p0_over_cells}$\mu$V } \\
-\end{tabular}
-\label{table:params}
-\caption{ \textbf{Parameters of the NSI characterization.}
-We summarize here all analysis parameters. We separate the parameters into two classes: the fixed parameters that are constant across different recordings (although there value has been experimentally determined from the average data, see Figure {pLFP} and Figure {NSI}) and the data-driven parameters that are evaluated on single recordings.}
-\normalfont
-\end{table}
+*** pieces of intro
+# In the present study, we combined intra- and extracellular recordings in awake mice somato-sensory cortex to analyze how this diversity of network states (measured in terms of $V_m$ fluctuations) translate into extracellular signals. We introduced a Network State Index (NSI) and, using such a measure, we found that the fluctuations of the extracellular high-gamma power enabled a robust classification of network states mapping the predictions of intracellular signals. We finally analyzed how the distribution of network states within a recording period shaped the average correlations between the single cell (intracellular) and population (extracellular) signals. We found that the variability of network states, beyond the occurrence of slow synchronous activity, is the main factor shaping the average correlations between single cell and population signals in neocortex.
+*** pieces of text 
 
-* Supplementary Material
+It could also be hypothesized that the most accurate classification is the most conservative one, i.e. the one that maximizes the proportion of "unclassified" states. Interestingly, one can see on Figure {NSI}c that such value is achieved for $\alpha$={alpha_opt_of_max_unclassified} (thin grey dashed line), i.e. close to the $\alpha^{opt}$={alpha_opt} estimate (thin purple dashed line, where the proportion of unclassified states reaches {fraction_unclassified_for_alpha_opt}\% of its maximal value) obtained with the above procedure.
+
+ that beyond the occurrence of slow synchronous activity, critically contribute to the average correlations between single cell and population signals in neocortex.  strongly correlates with the $V_m$ fluctuations and allow the design of a robust classification  we designed a classification  . From this processed LFP, we derive 
+
+# Importantly, this increased statistical dependency demonstrates that not only the occurence of the rhythmic activity explains the correlation between the $V_m$ and the pLFP, but more generally the variability in network states (i.e. also the variability in non-rhythmic states). 
+
+*** Origin of slow oscill
+
+This rather suggests that, to some degree, this pattern would be externally generated or would involve a low number of synaptic connections in the local network. 
+
+Rhytmicity might emerge from intrinsic pacemaker-like conductances in a few cells targeting the local network
+
 *** FIGURE: Wavelet transform with its custom normalization
 #+options : {'label':'Morlet', 'extent':'singlecolumn'}
 (a) The Morlet wavelet at different frequencies (real and imaginary parts as plain and dashed lines respectively). (b) Time-frequency analysis based on the wavelet transform. Note that the chosen normalization (normalizing with respect to a sinusoid rather than the wavelet itself) insures that the amplitude of a modulated signals is kept in the amplitude of the wavelet transform.
 [[./Figures/Fig_Wavelet_Demo.png]]
-
-*** Normalization of the Wavelet Transform
 
 *** FIGURE: Dependency on the $\alpha$ parameter for the link between the granularity of the pLFP-defined networks states and the granularity of the $V_m$ fluctuations
 #+options : {'label':'SuppGranul', 'width':0.99}
@@ -370,4 +411,34 @@ Sliding mean window  & $T_{mean} & {T_sliding_mean}ms \\[.5em]
 # ~ & \multicolumn{1}{c|}{ \bf Parameter} & {\hfill \bf Symbol \hfill} & \multicolumn{1}{c}{ \bf Value} \\[.1em]
 # % \multirow{8}{*}{\rotatebox[origin=c]{90}{\centering \bf NSI parameters }} & pLFP root freq.     & $f_0$     & {f0} Hz \\[.5em]
 
+*** fancy table 
+# to be filled   
+\begin{table}[tb!]
+\small
+\centering
+\begin{tabular}{c|c|c|c}
+~ & \multicolumn{1}{c|}{ \bf Parameter} & {\hfill \bf Symbol \hfill} & \multicolumn{1}{c}{ \bf Value} \\
+\hline
+\multirow{4}{*}{\rotatebox[origin=c]{90}{\parbox[c]{1cm}{\centering \bf fixed }}} 
+                     & \multirow{2}{*}{ \centering pLFP root freq.} 
+                     & \multirow{2}{*}{ \centering $f_0$ } 
+                     & \multirow{2}{*}{ \centering {f0} Hz} \\[-0.1cm]
+&&& \\[-0.1cm]
+& \multirow{2}{*}{\parbox[c]{3.5cm}{\centering pLFP band factor}} 
+                     & \multirow{2}{*}{$w_0$} 
+                     & \multirow{2}{*}{ {w0} } \\[0.1cm]
+&&& \\[-0.1cm]
+& \multirow{2}{*}{\parbox[c]{3.5cm}{\centering factor for rhythmicity threshold}} 
+                     & \multirow{2}{*}{$\alpha$} 
+                     & \multirow{2}{*}{ {alpha_opt} } \\[-0.1cm]
+&&& \\
+\hline
+\multirow{4}{*}{\rotatebox[origin=c]{90}{\parbox[c]{1cm}{\centering \bf data-driven }}} & text &&\\
+& \multirow{2}{*}{\parbox[c]{3.5cm}{pLFP lower bound}} & \multirow{2}{*}{$p_0} & \multirow{2}{*}{ {p0_over_cells}$\mu$V } \\
+\end{tabular}
+\label{table:params}
+\caption{ \textbf{Parameters of the NSI characterization.}
+We summarize here all analysis parameters. We separate the parameters into two classes: the fixed parameters that are constant across different recordings (although there value has been experimentally determined from the average data, see Figure {pLFP} and Figure {NSI}) and the data-driven parameters that are evaluated on single recordings.}
+\normalfont
+\end{table}
 
