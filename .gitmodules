@@ -7,3 +7,6 @@
 [submodule "neural_network_dynamics"]
 	path = neural_network_dynamics
 	url = https://yzerlaut@bitbucket.org/yzerlaut/neural_network_dynamics.git
+[submodule "paper"]
+	path = paper
+	url = https://yzerlaut@bitbucket.org/yzerlaut/paper.git
