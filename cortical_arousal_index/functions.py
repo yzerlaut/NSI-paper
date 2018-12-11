@@ -156,6 +156,7 @@ def compute_Network_State_Index(data,
                                 Var_criteria=2,
                                 already_low_freqs_and_mean=False):
     
+
     if not already_low_freqs_and_mean:
         # sliding mean
         data[key+'_sliding_mean'] = gaussian_smoothing(data[key], int(T_sliding_mean/data['sbsmpl_dt']))
@@ -181,6 +182,18 @@ def compute_Network_State_Index(data,
                                 target_key=target_key,
                                 Tstate=Tstate,
                                 Var_criteria=Var_criteria)
+
+def compute_theta_and_gamma(data,
+                            theta_freqs = np.linspace(2, 10, 8),
+                            gamma_freqs = np.arange(30, 80, 10),
+                            target_key='Extra'):
     
+    # theta as max power in [2,10]Hz band
+    data[target_key+'_theta_power'] = np.max(np.abs(my_cwt(data['sbsmpl_Extra'].flatten(), theta_freqs, data['sbsmpl_dt'])), axis=0)
+    # gamma as min power in [30,80]Hz band
+    data[target_key+'_gamma_power'] = np.mean(np.abs(my_cwt(data['sbsmpl_Extra'].flatten(), gamma_freqs, data['sbsmpl_dt'])), axis=0)
+        
+        
+
 if __name__=='__main__':
     print(gaussian_smoothing(np.linspace(0,100,50), 1.3)) # translating to integer values... so keep in mind

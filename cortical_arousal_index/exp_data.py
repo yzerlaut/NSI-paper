@@ -73,6 +73,7 @@ def load_data(fn, args,
             'Extra':raw_data[1][0],
             'name':fn.split(os.path.sep)[-1],
             'filename':fn}
+    
     data['dt'] = data['t'][1]-data['t'][0]
 
     if 'offset' in props:
@@ -98,6 +99,10 @@ def load_data(fn, args,
                                               alpha=args.alpha,
                                               T_sliding_mean=args.T_sliding_mean,
                                               with_Vm_low_freq=with_Vm_low_freq)
+        
+        # extract theta and gamma power from LFP
+        functions.compute_theta_and_gamma(data)
+        
         # MUA from extracellular signal 
         data['MUA'] = gaussian_smoothing(\
                         np.abs(butter_bandpass_filter(data['Extra'],\
@@ -107,8 +112,8 @@ def load_data(fn, args,
         data['sbsmpl_MUA'] = 1e-3*data['MUA'][::int(args.subsampling_period/data['dt'])][:-1] # in uV
         # Spike times from Vm
         data['tspikes'] = data['t'][np.argwhere((data['Vm'][:-1]<=args.spike_threshold) & (data['Vm'][1:]>args.spike_threshold)).flatten()]
-        data['sbsmpl_FR'] = np.histogram(data['tspikes'], bins=data['sbsmpl_t'])[0]/data['sbsmpl_dt']    
-        
+        data['sbsmpl_FR'] = np.histogram(data['tspikes'], bins=data['sbsmpl_t'])[0]/data['sbsmpl_dt']
+
     return data
 
 ###############################################################
