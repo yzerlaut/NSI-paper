@@ -10,7 +10,7 @@ datadir= '../../sparse_vs_balanced'+os.path.sep+'sparse_vs_balanced'+os.path.sep
 s1 = 'sparse_vs_balanced'+os.path.sep+'sparse_vs_balanced'
 s2 = 'cortical_arousal_index'+os.path.sep+'cortical_arousal_index'
 
-cell_colormap = get_linear_colormap(Blue, Red)
+cell_colormap = get_linear_colormap(Orange, Blue)
 
 def show_raw_data_Vm_Vext(data,
                           tstart=12, twidth=168,
@@ -61,6 +61,8 @@ def show_raw_data_Vm_Vext(data,
 
     # ax.annotate('$V_m^0$', (tstart+twidth, data['p0_Vm']), color=Vm_color)
     # ax.annotate('0$\mu$V', (tstart+twidth, Vext_loc), color=Vext_color)
+    ax.annotate('$V_m$', (-0.03, .15), color=Vm_color, xycoords='axes fraction')
+    ax.annotate('$V_{ext}$', (-0.04, 0.65), color=Vext_color, xycoords='axes fraction')
     set_plot(ax, [], xlim=[tstart, tstart+twidth], ylim=ylim)
     
     return fig, ax

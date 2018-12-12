@@ -103,7 +103,7 @@ def load_data(fn, args,
         # extract theta and gamma power from LFP
         functions.compute_theta_and_gamma(data)
         
-        # MUA from extracellular signal 
+        # MUA from extracellular signal
         data['MUA'] = gaussian_smoothing(\
                         np.abs(butter_bandpass_filter(data['Extra'],\
                                  args.MUA_band[0], args.MUA_band[1], 1./data['dt'], order=5)),\
@@ -595,7 +595,6 @@ def extended_NSI_correlate_analysis(args):
                   'LINK_MUA_PHASE':np.ones((len(NSI_DISCRET)-1, len(phase_bins)))*np.inf}
         
         
-
         for iND in range(len(NSI_DISCRET)-1):
             cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>NSI_DISCRET[iND]) & (DATA[icell]['NSI']<=NSI_DISCRET[iND+1])
 
@@ -666,6 +665,8 @@ def extended_NSI_correlate_analysis(args):
               'phase_bins': phase_bins,
               'Vm0':np.zeros(len(FILENAMES)),
               'NSI_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
+              # 'THETA_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
+              # 'GAMMA_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
               'FR_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
               'MUA_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
               'DEPOL_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
@@ -673,10 +674,13 @@ def extended_NSI_correlate_analysis(args):
               'LINK_STD_DEPOL_PHASE':np.ones((len(FILENAMES), len(NSI_DISCRET)-1, len(phase_bins)))*np.inf,
               'LINK_FR_PHASE':np.ones((len(FILENAMES), len(NSI_DISCRET)-1, len(phase_bins)))*np.inf,
               'LINK_MUA_PHASE':np.ones((len(FILENAMES), len(NSI_DISCRET)-1, len(phase_bins)))*np.inf}
+    
     for icell, fn in enumerate(FILENAMES):
         output = np.load(fn.replace('.abf', '_extended_analysis.npz'))
         OUTPUT['Vm0'][icell] = output['Vm0']
         OUTPUT['NSI_LEVELS'][icell] = np.array(output['NSI_LEVELS']).flatten()
+        # OUTPUT['THETA_LEVELS'][icell] = np.array(output['THETA_LEVELS']).flatten()
+        # OUTPUT['GAMMA_LEVELS'][icell] = np.array(output['GAMMA_LEVELS']).flatten()
         OUTPUT['FR_LEVELS'][icell] = np.array(output['FR_LEVELS']).flatten()
         OUTPUT['MUA_LEVELS'][icell] = np.array(output['MUA_LEVELS']).flatten()
         OUTPUT['DEPOL_LEVELS'][icell] = np.array(output['DEPOL_LEVELS']).flatten()
@@ -974,6 +978,6 @@ if __name__=='__main__':
     if len(FIGS)>0:
         show()
     for i, fig in enumerate(FIGS):
-        fig.savefig('/Users/yzerlaut/Desktop/temp'+str(i)+'.svg')
+        fig.savefig(desktop+'temp'+str(i)+'.svg')
 
         
