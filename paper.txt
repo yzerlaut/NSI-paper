@@ -98,6 +98,15 @@ We recorded
 
 The first three episodes have 
 
+We found a significant correlation between the mean theta power within a recording and the $V_m$-$V_ext$ correlation coefficient ({stat_test_link_between_cc_and_mean_theta}), and this positive correlation was weaker for the power of the gamma and did not reach statistical significance ({stat_test_link_between_cc_and_mean_gamma}). 
+
+the depolarization level has been found to be a critical feature of the signature of specific network states
+this is not captured by the gamma to theta ratio
+
+
+Similarly the mean ratio of gamma and theta power over the recrding
+did not explain the diversity of correlation value observed ({stat_test_link_between_cc_and_gamma_to_theta}).
+
 *** The time-varying high-gamma power of the extracellular potential exhibits a high correlation with the membrane potential of pyramidal neurons in awake mice S1. 
 
 [[Figure {pLFP} around here]]
@@ -190,9 +199,9 @@ We conclude that, in the present dataset, the average correlation between a sing
 
 * Figures
 
-*** Dataset and current characterization of network states.
+*** Extracellular and intracellular dynamics during wakefulness in mice sensory cortex. 
 #+options : {'label':'data', 'extent': 'doublecolumn', 'file':'./Figures/Fig_dataset.png'}
-(a) Example simultaneous recording of the extracellular ($V_{ext}$, top) and membrane potential of a layer 2/3 pyramidal cell ($V_m$, bottom). In the middle, we show the time-varying high-gamma power (brown thin line) and its smoothed fluctuations (brown thick line, the pLFP signal). The $p_0$ value (brown dotted line) corresponds to the first 100th percentile of the pLFP distribution over the whole recording. (b) We look for the frequency band that maximizes the correlation with the simultaneously recorded membrane potential. This is achieved by varying independently a root frequency $f$ and a width factor $w$ yielding the frequency band [$f$/$w$, $f \cdot w$]. For each frequency band, we divide the band into 20 evenly spaced wavelet frequencies, we compute the mean over frequencies of the wavelet power (resulting in the time-varying power shown in \textbf{a}) and report the cross-correlation with the $V_m$ trace (cc $V_m$-pLFP). The optimal band is found for $f_{opt}$={f0}Hz and $w_{opt}$={w0}. (c) Testing the effect of temporal smoothing on the cross-correlation with the $V_m$ signal. Shown for all cells (individual cells are color-coded). At $T_{smoothing}$=0ms, one can see the mean value of \textbf{a} and its variability over cells (black errorbar). (d) After normalizing the cross-correlation of *c* by their maximum amplitude and substraction of their level at $T_{smoothing}$=0ms, a clear peak in the cross-correlation appears at $T_{opt}$={Tsmooth}ms.
+(a) Two example simultaneous recording (top: recording #2, bottom:#11) of the extracellular ($V_{ext}$) and membrane potential ($V_m$) of a layer 2/3 pyramidal cell. The $V_m^0$ value (black dotted line) corresponds to the first 100th percentile of the $V_m$ distribution over the whole recording. (b) Sample episodes of duration 1.5s within the recording #11 shown in *a* (the episode numbering matches those of *a*). We analyze the fluctuations of $V_{ext}$ in the middle plot, we show: (1) the standard deviation of the over the 1.5s $\sigma_{V_{ext}}$, (2) the envelope of the [2,10]Hz component of the fluctuations ($\theta$ pow.) and (3) the envelope of the [30,80]Hz component of the fluctuations ($\gamma$ pow.). (c) Histograms of the absolute correlation coefficient between $V_{ext}$ and $V_{m}$ per recording. The color code, from blue to red,  sorts the recordings according to this measure. (d) Histogram of the $\theta$ power in $V_{ext}$ over the whole recording for each recording (color-coded). (e) Mean polarization level as a function of the $\gamma$-to-$\theta$ power ratio for the recording #11 shown in *a* and *b*. Note that episodes of very different depolarization levels are associated to the same level of  $\gamma$-to-$\theta$.  (f) Mean polarization level of as a function of the $\gamma$-to-$\theta$ power ratio for the recording #11 shown in *a* and *b*. 
 
 *** The time-varying high-gamma power of the extracellular potential maximizes the correlation with the membrane potential of pyramidal neurons in awake mice S1.
 #+options : {'label':'pLFP', 'extent': 'doublecolumn', 'file':'./Figures/Fig_pLFP_design.png'}

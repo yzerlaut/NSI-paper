@@ -10,7 +10,7 @@ datadir= '../../sparse_vs_balanced'+os.path.sep+'sparse_vs_balanced'+os.path.sep
 s1 = 'sparse_vs_balanced'+os.path.sep+'sparse_vs_balanced'
 s2 = 'cortical_arousal_index'+os.path.sep+'cortical_arousal_index'
 
-cell_colormap = get_linear_colormap(Orange, Blue)
+cell_colormap = get_linear_colormap(Blue, Red)
 
 def show_raw_data_Vm_Vext(data,
                           tstart=12, twidth=168,
@@ -56,7 +56,7 @@ def show_raw_data_Vm_Vext(data,
     ax.annotate(str(int(1e3*Vext_scale))+'$\mu$V',(t0+Tscale/10., y0-Vm_scale), color=Vext_color, fontsize=FONTSIZE)
 
     for n, interval in enumerate(highlighted_episodes):
-        ax.annotate('(%i)'%(n+1), (interval[0], ylim[1]), color=Grey)
+        ax.annotate('(%i)'%(n+1), (interval[0], ylim[1]), color=Grey, fontsize=FONTSIZE)
         ax.fill_between(interval, np.ones(2)*ylim[0], np.ones(2)*ylim[1], alpha=.1, color='k', lw=0)
 
     # ax.annotate('$V_m^0$', (tstart+twidth, data['p0_Vm']), color=Vm_color)
