@@ -100,8 +100,8 @@ def load_data(fn, args,
                                               T_sliding_mean=args.T_sliding_mean,
                                               with_Vm_low_freq=with_Vm_low_freq)
         
-        # extract theta and gamma power from LFP
-        functions.compute_theta_and_gamma(data)
+        # extract delta and gamma power from LFP
+        functions.compute_delta_and_gamma(data)
         
         # MUA from extracellular signal
         data['MUA'] = gaussian_smoothing(\
@@ -665,7 +665,7 @@ def extended_NSI_correlate_analysis(args):
               'phase_bins': phase_bins,
               'Vm0':np.zeros(len(FILENAMES)),
               'NSI_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
-              # 'THETA_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
+              # 'DELTA_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
               # 'GAMMA_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
               'FR_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
               'MUA_LEVELS':[np.empty(1) for i in range(len(FILENAMES))],
@@ -679,7 +679,7 @@ def extended_NSI_correlate_analysis(args):
         output = np.load(fn.replace('.abf', '_extended_analysis.npz'))
         OUTPUT['Vm0'][icell] = output['Vm0']
         OUTPUT['NSI_LEVELS'][icell] = np.array(output['NSI_LEVELS']).flatten()
-        # OUTPUT['THETA_LEVELS'][icell] = np.array(output['THETA_LEVELS']).flatten()
+        # OUTPUT['DELTA_LEVELS'][icell] = np.array(output['DELTA_LEVELS']).flatten()
         # OUTPUT['GAMMA_LEVELS'][icell] = np.array(output['GAMMA_LEVELS']).flatten()
         OUTPUT['FR_LEVELS'][icell] = np.array(output['FR_LEVELS']).flatten()
         OUTPUT['MUA_LEVELS'][icell] = np.array(output['MUA_LEVELS']).flatten()
@@ -938,6 +938,7 @@ if __name__=='__main__':
     parser.add_argument('--Var_criteria', type=float, default=2.)
     parser.add_argument('--T_sliding_mean', type=float, default=500e-3)
     parser.add_argument('--alpha', type=float, default=2.65)
+    parser.add_argument('--delta_band', nargs='+', type=float, default=[1., 5.])
     # parameters of Multi-Unit-Activity (MUA)
     parser.add_argument('--MUA_band', nargs='+', type=float, default=[300., 3000.])
     parser.add_argument('--MUA_smoothing', type=float, default=20e-3)
