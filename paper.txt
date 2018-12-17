@@ -96,9 +96,10 @@ We implemented the described analysis into a publicly available software, see \u
 
 [[Figure {data} around here]]
 
-In the {N_recordings} recordings over {N_mice} of the {duration}
 
-We recorded simultaneously the extracellular potential ($V_{ext}$) and the membrane potential of a pyramidal cell ($V_{m}$)
+We recorded simultaneously the extracellular potential ($V_{ext}$) and the membrane potential ($V_{m}$) of a pyramidal cell in the superficial layers of the barrel cortex (S1) in head-fixed awake mouse. In the {N_recordings} recordings over {N_mice} of the {duration}
+within such recording epochs, we found that (see rec.#2 and rec.#14 in Figure {data}a)
+
 
 The first three episodes have 
 
