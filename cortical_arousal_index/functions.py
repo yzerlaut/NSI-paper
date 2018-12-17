@@ -147,7 +147,7 @@ def compute_Network_State_Index(data,
                                 key='pLFP',
                                 target_key='NSI',
                                 p0_key='p0',
-                                freqs = np.linspace(1,5,20),
+                                freqs = np.linspace(2,5,10),
                                 Tstate=200e-3,
                                 alpha=2.,
                                 with_Vm_low_freq=False,
@@ -183,15 +183,17 @@ def compute_Network_State_Index(data,
                                 Tstate=Tstate,
                                 Var_criteria=Var_criteria)
 
-def compute_delta_and_gamma(data,
-                            delta_freqs = np.linspace(1, 5, 10),
-                            gamma_freqs = np.arange(30, 80, 10),
+def compute_delta_and_gamma(data, args,
                             target_key='Extra'):
+
+    
+    delta_freqs = np.linspace(args.delta_band[0], args.delta_band[1], 10)
+    gamma_freqs = np.linspace(args.gamma_band[0], args.gamma_band[1], 20)
     
     # delta as max power in [2,10]Hz band
     data[target_key+'_delta_power'] = np.max(np.abs(my_cwt(data['sbsmpl_Extra'].flatten(), delta_freqs, data['sbsmpl_dt'])), axis=0)
-    # gamma as min power in [30,80]Hz band
-    data[target_key+'_gamma_power'] = np.mean(np.abs(my_cwt(data['sbsmpl_Extra'].flatten(), gamma_freqs, data['sbsmpl_dt'])), axis=0)
+    # gamma as max power in [30,80]Hz band
+    data[target_key+'_gamma_power'] = np.max(np.abs(my_cwt(data['sbsmpl_Extra'].flatten(), gamma_freqs, data['sbsmpl_dt'])), axis=0)
         
         
 

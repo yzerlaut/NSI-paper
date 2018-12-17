@@ -94,6 +94,7 @@ def load_data(fn, args,
                                  smoothing=args.T0)
         # compute the Network State Index
         functions.compute_Network_State_Index(data,
+                                              freqs=np.linspace(args.delta_band[0], args.delta_band[1], 8), # freqs in delta band
                                               Tstate=args.Tstate,
                                               Var_criteria=data['p0'], # HERE TAKING NOISE AS CRITERIA !!!
                                               alpha=args.alpha,
@@ -101,7 +102,7 @@ def load_data(fn, args,
                                               with_Vm_low_freq=with_Vm_low_freq)
         
         # extract delta and gamma power from LFP
-        functions.compute_delta_and_gamma(data)
+        functions.compute_delta_and_gamma(data, args)
         
         # MUA from extracellular signal
         data['MUA'] = gaussian_smoothing(\
@@ -462,7 +463,7 @@ def get_polarization_level(args):
         # ====== ASYNCH COND ! =========
         cond = DATA[icell]['NSI_validated'] & (DATA[icell]['NSI']>0.) 
         HIST = [[] for jj in range(len(phase_bins))]
-        phase_data = np.angle(np.mean(DATA[icell]['W_low_freqs'], axis=0))
+        phase_data = np.angle(np.mean(DATA[icell]['pLFP_W_low_freqs'], axis=0))
         for ii in np.arange(len(DATA[icell]['NSI']))[cond]:
             vm = DATA[icell]['sbsmpl_Vm'][ii-int(iTstate/2):ii+int(iTstate/2)]
             VM_ASYNCH_LEVELS.append(np.mean(vm[vm < args.spike_threshold])) # removing spikes
@@ -942,7 +943,8 @@ if __name__=='__main__':
     parser.add_argument('--Var_criteria', type=float, default=2.)
     parser.add_argument('--T_sliding_mean', type=float, default=500e-3)
     parser.add_argument('--alpha', type=float, default=2.65)
-    parser.add_argument('--delta_band', nargs='+', type=float, default=[1., 5.])
+    parser.add_argument('--delta_band', nargs='+', type=float, default=[2., 5.])
+    parser.add_argument('--gamma_band', nargs='+', type=float, default=[30., 80.])
     # parameters of Multi-Unit-Activity (MUA)
     parser.add_argument('--MUA_band', nargs='+', type=float, default=[300., 3000.])
     parser.add_argument('--MUA_smoothing', type=float, default=20e-3)

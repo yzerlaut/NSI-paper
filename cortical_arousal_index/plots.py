@@ -2,6 +2,7 @@ import sys, pathlib, os, json
 import numpy as np
 import matplotlib.pylab as plt
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
+from data_analysis.processing.signanalysis import gaussian_smoothing
 
 from graphs.my_graph import *
 
@@ -12,6 +13,26 @@ s2 = 'cortical_arousal_index'+os.path.sep+'cortical_arousal_index'
 
 cell_colormap = get_linear_colormap(Blue, Red)
 
+def compute_relationship_smooth_and_plot(cbins, pop_hist, num_hist, ax,
+                                         Nsmooth = 10):
+    
+    x, y, sy = [], [], []
+    for xx, ph, N in zip(cbins, pop_hist, num_hist):
+        if len(ph)>1:
+            x.append(xx)
+            y.append(np.sum(np.array(ph)*np.array(N)/np.sum(N)))
+            sy.append(np.sqrt(np.sum((np.array(ph)-y[-1])**2*np.array(N)/np.sum(N))))
+    
+    xx, yy, ss = np.linspace(np.min(x), np.max(x), int(Nsmooth/2*len(x))), np.zeros(int(Nsmooth/2*len(x))), np.zeros(int(Nsmooth/2*len(x)))
+    for i in range(len(xx)):
+        i0 = np.argmin((xx[i]-x)**2)
+        yy[i], ss[i] = y[i0], sy[i0]
+    
+    yy, ss = gaussian_smoothing(yy, Nsmooth), gaussian_smoothing(ss, Nsmooth)
+    ax.plot(xx, yy, 'k-', lw=1.5)
+    ax.fill_between(xx, yy+ss, yy-ss, color='k', alpha=.5, lw=0)
+
+    
 def show_raw_data_Vm_Vext(data,
                           tstart=12, twidth=168,
                           highlighted_episodes=[],
