@@ -112,6 +112,10 @@ def load_data(fn, args,
         data['sbsmpl_MUA'] = 1e-3*data['MUA'][::int(args.subsampling_period/data['dt'])][:-1] # in uV
         # Spike times from Vm
         data['tspikes'] = data['t'][np.argwhere((data['Vm'][:-1]<=args.spike_threshold) & (data['Vm'][1:]>args.spike_threshold)).flatten()]
+        Vpeaks = []
+        for tt in data['tspikes']:
+            Vpeaks.append(np.max(data['Vm'][(data['t']>tt-5e-3) & (data['t']<tt+5e-3)])) # max in Vm surrouding spike time
+        data['Vpeak_spikes'] = np.array(Vpeaks)
         data['sbsmpl_FR'] = np.histogram(data['tspikes'], bins=data['sbsmpl_t'])[0]/data['sbsmpl_dt']
 
     return data

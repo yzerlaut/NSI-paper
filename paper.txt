@@ -94,6 +94,8 @@ We implemented the described analysis into a publicly available software, see \u
 
 *** Intracellular and extracellular dynamics in awake mice somatosensory cortex
 
+[[Figure {data} around here]]
+
 In the {N_recordings} recordings over {N_mice} of the {duration}
 
 We recorded simultaneously the extracellular potential ($V_{ext}$) and the membrane potential of a pyramidal cell ($V_{m}$)
