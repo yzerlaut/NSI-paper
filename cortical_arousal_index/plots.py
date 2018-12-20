@@ -3,12 +3,12 @@ import numpy as np
 import matplotlib.pylab as plt
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1]))
 from data_analysis.processing.signanalysis import gaussian_smoothing
+from graphs.my_graph import *
 # COLORS
 NSI_color, Vm_color, LFP_color, pLFP_color = Brown, 'k', Grey, Brown
 Rhythm_color, Asynch_color = Purple, Kaki
 
 
-from graphs.my_graph import *
 
 curdir=os.path.abspath(__file__).replace(os.path.basename(__file__),'')
 datadir= '../../sparse_vs_balanced'+os.path.sep+'sparse_vs_balanced'+os.path.sep
