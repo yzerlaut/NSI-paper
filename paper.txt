@@ -72,33 +72,33 @@ Note also that this classification relies on the difference between the average 
 
 *** Calibration of the rhythmicity condition
 
-The parameter $\alpha$ weights the propensity to classify the network activity as rhythmic. This is visible on Figure {NSI}b, when raising the $\alpha$ parameter, the proportion of rhythmic states gradually increase from $\sim$0\% at $\alpha<1$ to $\sim$100\% at $\alpha$>6. This parameter can therefore be adjusted with respect to the specific context in which the NSI is used. 
-
-In the following, we extract an optimal value for this parameter from our dataset. We used our simultaneous $V_m$ recording to find such a value. In Figure {NSI}c, we show the mean {delta_band} envelope of the membrane potential $V_m$ as a function of the $\alpha$ parameter (after averaging over all episodes classified as rhythmic for a given cell, computed for all n={N_recordings} recordings). The low frequency $V_m$ envelope exhibits a clear exponential decay. A natural parameter that insures a consistency between the slow-rhythmicity in the $V_m$ and in the pLFP is therefore provided by the decay constant of this decrease. We fitted this parameter and found it to be $\alpha^{opt}$={alpha_opt}. For such a value, we found a strong decrease in $V_m$ envelope from rhythmic to non-rhythmic states after (pLFP-based) NSI classification for all cells (paired t-test, p={pvalue_decrease_in_slow_power_Vm_synch_to_asynch}, n={Ncells} recordings). Indeed, for such a value, the $V_m$ fluctuations of rhythmic episodes exhibited a clear oscillatory pattern after averaging with respect to the phase of the pLFP signal while the pLFP phase has a much weaker impact in the non-rhythmic episodes. The rhythmic episodes displayed a mean hyperpolarization of {mean_depol_from_0_to_pi_synch}mV from the 0-phase to the $\pi$-phase of the pLFP signal while the non-rhythmic episodes displayed an hyperpolarization of {mean_depol_from_0_to_pi_asynch}mV. Given the high variability of the depolarization at the single cycle level in both cases, {std_depol_from_0_to_pi_synch}mV for rhythmic episodes and {std_depol_from_0_to_pi_asynch}mV for non-rhythmic episodes (variability of the hyperpolarization level over all cycles), only the rhythmic activity exhibits a high reliability of single cycle depolarization (as quantified by the mean-to-variability ratios across cycles: {mean_to_var_depol_from_0_to_pi_synch} for rhythmic states compared to {mean_to_var_depol_from_0_to_pi_asynch} for non-rhythmic states, p={pval_mean_to_var_depol_from_0_to_pi}, n={N_recordings} recordings, paired t-test).
+The parameter $\alpha$ weights the propensity to classify the network activity as rhythmic. This is visible on Figure {NSI}b, when raising the $\alpha$ parameter, the proportion of rhythmic states gradually increase from $\sim$0\% at $\alpha<1$ to $\sim$100\% at $\alpha$>6. We used our simultaneous $V_m$ recording to find an optimal value for the $\alpha$ parameter. In Figure {NSI}c, we show the mean {delta_band} envelope of the membrane potential $V_m$ as a function of the $\alpha$ parameter (after averaging over all episodes classified as rhythmic for a given cell, computed for all n={N_recordings} recordings). The low frequency $V_m$ envelope exhibits a clear exponential decay. A natural parameter that insures a consistency between the slow-rhythmicity in the $V_m$ and in the pLFP is therefore provided by the decay constant of this decrease. We fitted this parameter and found it to be $\alpha^{opt}$={alpha_opt}. For such a value, we found a strong decrease in $V_m$ envelope from rhythmic to non-rhythmic states after (pLFP-based) NSI classification for all cells (paired t-test, p={pvalue_decrease_in_slow_power_Vm_synch_to_asynch}, n={Ncells} recordings). Indeed, for such a value, the $V_m$ fluctuations of rhythmic episodes exhibited a clear oscillatory pattern after averaging with respect to the phase of the pLFP signal while the pLFP phase has a much weaker impact in the non-rhythmic episodes. The rhythmic episodes displayed a mean hyperpolarization of {mean_depol_from_0_to_pi_synch}mV from the 0-phase to the $\pi$-phase of the pLFP signal while the non-rhythmic episodes displayed an hyperpolarization of {mean_depol_from_0_to_pi_asynch}mV. Given the high variability of the depolarization at the single cycle level in both cases, {std_depol_from_0_to_pi_synch}mV for rhythmic episodes and {std_depol_from_0_to_pi_asynch}mV for non-rhythmic episodes (variability of the hyperpolarization level over all cycles), only the rhythmic activity exhibits a high reliability of single cycle depolarization (as quantified by the mean-to-variability ratios across cycles: {mean_to_var_depol_from_0_to_pi_synch} for rhythmic states compared to {mean_to_var_depol_from_0_to_pi_asynch} for non-rhythmic states, p={pval_mean_to_var_depol_from_0_to_pi}, n={N_recordings} recordings, paired t-test).
 
 *** Electrophysiological signatures of NSI-defined network states
 
-We analyzed the electrophysiological characterizing the network regimes defined by the NSI measure. On Figure {NSI}d, we show the relationship between the NSI level and the mean polarization value (within the $T_{state}$/2 window) for a single recording (rec.\#11) both for single episodes (those highlighted in Figure {NSI}a and Figure {data}b) as well as for the average over episodes. On Figure {NSI}e, we show the relationship between the NSI level and the mean polarization value across all cells. On Figure {NSI}f, we show the relationship between the NSI level and the multi-unit activity (MUA) across the n={N_recordings} recordings. States of robust rythmicity (high $\delta$ envelope, see episode 1 in Figure {NSI}a) have a strongly negative NSI and are associated to intermediate depolarization and MUA levels. When the delta-envelope fades out (from episode 2 to 3,4), both the depolarization and the MUA levels go down to their minimum observed values. States where the delta component does not significantly contribute to the network activity (quantified by the pLFP) are classified as non-rhythmic (i.e. NSI>0) and both their depolarization and MUA levels strongly increase with the mean level of network activity (the NSI measure).
+After having determined all parameters required for the NSI analysis (summarized in Table {params}), we then analyzed the electrophysiological characterizing the network regimes defined by the NSI measure. On Figure {NSI}d, we show the relationship between the NSI level and the mean polarization value (within the $T_{state}$/2 window) for a single recording (rec.\#11) both for single episodes (those highlighted in Figure {NSI}a and Figure {data}b) as well as for the average over episodes. On Figure {NSI}e, we show the relationship between the NSI level and the mean polarization value across all cells. On Figure {NSI}f, we show the relationship between the NSI level and the multi-unit activity (MUA) across the n={N_recordings} recordings. States of robust rythmicity (high $\delta$ envelope, see episode 1 in Figure {NSI}a) have a strongly negative NSI and are associated to intermediate depolarization and MUA levels. When the delta-envelope fades out (from episode 2 to 3,4), both the depolarization and the MUA levels go down to their minimum observed values. States where the delta component does not significantly contribute to the network activity (quantified by the pLFP) are classified as non-rhythmic (i.e. NSI>0) and both their depolarization and MUA levels strongly increase with the mean level of network activity as captured by the NSI measure (Figure {NSI}e,f).
 
-# The present analysis therefore gives a strong support to the "U-model" of cortical states during wakefulness (Mcginley et al., 2015b): both the mean high-gamma power and the mean multi-unit activity are strongly comodulated with the depolarization level in single cells.
 
-We conclude that the NSI measure fills in the gaps of the spectral characterizations, it preserves the key features of network states during wakefulness and gradually classifies activity regimes from: delta-band activity for negative NSI levels, to asynchronous regimes at low activity levels (in terms of MUA and synaptically-evoked depolarizations), to asynchronous regimes at high activity levels.
+
+%% # The present analysis therefore gives a strong support to the "U-model" of cortical states during wakefulness (Mcginley et al., 2015b): both the mean high-gamma power and the mean multi-unit activity are strongly comodulated with the depolarization level in single cells.
+
+We conclude that the NSI fills in the gaps of the spectral characterizations (Figure {data}f,g), it preserves the key features of network states during wakefulness and gradually classifies activity regimes from delta-band activity for negative NSI levels, to asynchronous regimes at low activity levels (in terms of MUA and synaptically-evoked depolarizations), to asynchronous regimes at high activity levels.
 
 *** An estimate of the NSI accuracy
 
 [[Figure {All} around here]]
 
-We have determined all parameters required for the NSI analysis (summarized in Table {params}) and we now look for an estimate of the accuracy of such characterization. The initial motivation behind this classification was based on a qualitative correspondence between the pLFP and $V_m$ fluctuations. To obtain a cross-validation of our method, we now quantify this similarity across all our recordings.
+We now look for an estimate of the accuracy of such characterization. The initial motivation behind this classification was based on a qualitative correspondence between the pLFP and $V_m$ fluctuations. To obtain a cross-validation of our method, we now quantify this similarity across all our recordings.
 
 To perform such a comparison, we now apply the NSI method on the $V_m$ signal. The exact same procedure can indeed be applied by replacing the pLFP signal by the membrane potential $V_m$. The lower bound of the signal $p_0$ is translated into the $V_{m0}$ value by also taking the first 100th percentile of the $V_m$ distribution (see Figure {pLFP}a and Figure {All}a). We compute the sliding mean and the time-varying low frequency envelope with the same parameters as for the pLFP signal. From this we can derived the $X(t)$ and $Y(t)$ quantities and therefore the "$V_m$-defined NSI" signal according to Equation {NSI}. We now compare the value of the "$V_m$-defined NSI" signal during the validated network states of the "pLFP-defined NSI" signal. 
 
-We implement a strict criteria to compare the two values. This procedure is depicted in Figure {All}c. We first determine the scaling rule $F$ between the "$V_m$-defined NSI" signal ($\textrm{NSI}_{V_m}$) and the "pLFP-defined NSI" signal ($\textrm{NSI}_{\textrm{pLFP}}$) by performing a linear fit of the data predicting either both rythmicity or both non-rhythmicity (i.e. on the lower left or the upper right of the plots in Figure {All}c). Then a given time-point $t_i$ is associated to a correct network state identification if the difference between the predicted and observed point lies within a tolerance interval defined by the values $p^{tol}$ and $V_m^{tol}$. For $p^{tol}$, we took the average noise level of the pLFP signal across recordings, i.e. $p_{noise}$={p_noise_for_accuracy}. For $V_m^{tol}$, we arbitrarily took $V_m^{tol}$=2mV. The matching condition is therefore fullfilled if $ F\big( \textrm{NSI}_{V_m}(t_i) + V_m^{tol} \big) < \textrm{NSI}_{\textrm{pLFP}}(t_i) + p_{noise}$ and $ F\big( \textrm{NSI}_{V_m}(t_i) - V_m^{tol} \big) > \textrm{NSI}_{\textrm{pLFP}}(t_i) - p_{noise}$. The strictness of this criteria can be seen in Figure {All}c. Not only the states are taken as incorrect when there is a mismatch between the rhythmic vs non-rhythmic conditions (what happens in cells 2,4,6,7,8, see the non-matching events highlighed with a red cross) but also when the graded level of the rhythmicity or the non-rhythmicity is not matched (what happens in cells 1,3,5). For example, in cell 1, the $\textrm{NSI}_{V_m}$ value does not display a high enough value to be linearly related to $\textrm{NSI}_{pLFP}$ level according to the relationship $F$).
+We implement a strict criteria to compare the two values. This procedure is depicted in Figure {All}c. We first determine the scaling rule $F$ between the "$V_m$-defined NSI" signal ($\textrm{NSI}_{V_m}$) and the "pLFP-defined NSI" signal ($\textrm{NSI}_{\textrm{pLFP}}$) by performing a linear fit of the data predicting either both rythmicity or both non-rhythmicity (i.e. on the lower left or the upper right of the plots in Figure {All}c). Then a given time-point $t_i$ is associated to a correct network state identification if the difference between the predicted and observed point lies within a tolerance interval defined by the values $p^{tol}$ and $V_m^{tol}$. For $p^{tol}$, we took the average noise level of the pLFP signal across recordings, i.e. $p_{noise}$={p_noise_for_accuracy}. For $V_m^{tol}$, we arbitrarily took $V_m^{tol}$=2mV. The matching condition is therefore fullfilled if $ F\big( \textrm{NSI}_{V_m}(t_i) + V_m^{tol} \big) < \textrm{NSI}_{\textrm{pLFP}}(t_i) + p_{noise}$ and $ F\big( \textrm{NSI}_{V_m}(t_i) - V_m^{tol} \big) > \textrm{NSI}_{\textrm{pLFP}}(t_i) - p_{noise}$. The strictness of this criteria can be seen in Figure {All}c. Not only the states are taken as incorrect when there is a mismatch between the rhythmic vs non-rhythmic conditions (what happens in the cases shown in Figure {All}ii,iv-vii, see the non-matching events highlighed with a red cross) but also when the graded level of the rhythmicity or the non-rhythmicity is not matched (see Figure {All}i,iii). For example, in rec.\#11 (Figure {All}i), the $\textrm{NSI}_{V_m}$ value does not display a high enough value to be linearly related to $\textrm{NSI}_{pLFP}$ level according to the relationship $F$).
 
 Given the previous tolerance criteria, the final accuracy was found to be {matching_percentage_NSI_pLFP_Vm}\% over the n={Ncells} cells and all validated episodes. 
 
 Lowering the tolerance to $p^{tol}$={p_noise_for_accuracy_strict}$\mu$V and $V_m^{tol}$={Vm_noise_for_accuracy_strict}mV led to an accuracy of {matching_percentage_NSI_pLFP_Vm_strict}\%, meaning that in more than half of the cases the network state could be identified with a remarkable precision. It should also be noted that this accuracy value holds under the hypothesis that the $V_m$ classification would perfectly predict network states. Because a single pyramidal neuron samples only a finite amount of synapses, the relationship between its depolarization level and the endogenous local activity should be noisy. This estimate should therefore be interpreted as a lower bound of the method's accuracy. 
 
-The misclassification was however not homogeneous among the different rejection cases. One specific case, namely predicting non-rhythmic activity from the pLFP ($\textrm{NSI}_{pLFP}$>0) while predicting rhythmic activity from the $V_m$ signal ($\textrm{NSI}_{V_m}$<0), represented {misclassification_pLFP_NR_Vm_R}\% of the misclassifications over the merged episodes across all cells (i.e. {misclassification_pLFP_NR_Vm_R_total}\% of all episodes). We analyze in the next section the origin of this phenomenon.
+The misclassifications were however not homogeneous among the different rejection cases. One specific case, namely predicting non-rhythmic activity from the pLFP ($\textrm{NSI}_{pLFP}$>0) while predicting rhythmic activity from the $V_m$ signal ($\textrm{NSI}_{V_m}$<0), represented {misclassification_pLFP_NR_Vm_R}\% of the misclassifications over the merged episodes across all cells (i.e. {misclassification_pLFP_NR_Vm_R_total}\% of all episodes). We analyze in the next section the origin of this phenomenon.
 
 *** Graded aspect of network states in terms of pLFP and $V_m$ fluctuations: rhythmic versus non-rhythmic states
 
@@ -136,77 +136,6 @@ The factor explaining the highest percentage of the variability with {rsquared_$
 
 We conclude that, in the present dataset, the average correlation between a single cell signal ($V_m$) and the population signal (pLFP) can be largely explained (up to $\sim$80\%) by features of the NSI distributions. State variability among all NSI-defined states ($\sigma_{\textrm{NSI}}$) is a critical factor in determining such a variability. We decomposed this state variability and found that the two most prominent factors are the variability within non-rhythmic states ($\sigma_{\textrm{NSI}>0}$) followed by the occurrence of synchronous rhythmic activity ($F_{NSI<0}$). 
 
-* Methods
-
-*** Animals 
-
-Experimental procedures involving animals have been approved by the IIT Animal Welfare Body and by the Italian Ministry of Health (authorization \# 34/2015-PR and 125/2012-B), in accordance with the National legislation (D.Lgs. 26/2014) and the European legislation (European Directive 2010/63/EU). Experiments were performed on young-adult (4-6 weeks old, either sex) C57BL/6J mice (Charles River, Calco, Italy). The animals were housed in a 12:12 hr light-dark cycle in singularly ventilated cages, with access to food and water ad libitum.
-
-*** Simultaneous extra- and intracellular recordings in awake mice
-
-The experimental procedure for in vivo electrophysiological recordings in awake head-fixed mice have been previously described (Zucca et al., 2017). Briefly, custom metal plate were fixed on young (P22-P24) mice skull two weeks before the experimental sessions. After a 2-3 days recovery period, mice were habituated to sit quietly on the experimental setup for at least 7-10 days (one session per day and gradually increasing session duration). The day of the experiment, mice were anesthetized with 2.5\% isofluorane and a small craniotomy (0.5x0.5 mm) was opened over the somatosensory cortex and a 30 minutes long recovery period was provided to the animal before starting the recordings. Brain surface was kept moist with a HEPES-buffered artificial cerebrospinal fluid (aCSF). Extracellular recordings were performed by lowering a glass pipette filled with aCSF into the tissue with the deeper tip placed at $\sim$300 mm from pial surface. Simultaneous current-clamp patch-clamp recordings were carried out on superficial pyramidal neurons (100– 350 mm). 3–6 M$\Omega$ borosilicate glass pipettes (Hilgenberg, Malsfeld, Germany) were filled with an internal solution containing (in mM): K-gluconate 140, MgCl2 1, NaCl 8, Na2ATP 2, Na3GTP 0.5, HEPES 10, Tris-phosphocreatine 10 to pH 7.2 with KOH. Electrical signals were grounded at the top of the skull (at the location of the craniotomy) and were acquired using a Multiclamp 700B amplifier, filtered at 10 kHz, digitized at 50 kHz with a Digidata 1440 and stored with pClamp 10 (Axon Instruments, Union City, CA). Multi-Unit Activity (MUA) was computed by band-pass filtering (0.3-3 kHz) the extracellular potential $V_{ext}$ and taking the absolute value of the resulting signal (Einevoll et al., 2013).
-
-*** Wavelet Transform
-
-Our signal processing pipeline of the extracellular signal was based on the wavelet transform. We implemented a wavelet transform based on the Morlet wavelet, i.e. on the waveform:
-
-\begin{equation}
-M_{d_0}(f, t) = C_{d_0}(f) \cdot e^{2 i \pi f t} \cdot e^{-\big(\frac{\sqrt{2} \pi f t}{d_0}\big)^2}
-\label{eq:Morlet}
-\end{equation}
-where $f$ is the frequency of the wavelet and $d_0$ the decay parameter of the envelope. We kept a value of $d_0$=6 all along the study. The coefficient $C_{f, d_0}$ is the normalization coefficient of the wavelet. Note that, to keep a meaningful link with the physical units of the signal, we did not normalize the wavelet with respect to itself, but with respect to a sinusoid (otherwise the wavelet transform with standard normalization of a sinusoid of frequency $f$ and amplitude 1 has a value greater than 1 at the frequency $f$). The wavelet normalization coefficient was therefore defined, for a wavelet frequency $f$ and an extent $d_0$, as:
-
-\begin{equation}
-C_{d_0}(f) = \int_{-\infty}^{\infty} \cos (2 \pi f s) \cdot \overline{M_{d_0}(f, s)} \cdot ds = 
-\frac{d_0}{2 \sqrt{2 \pi } f} \Big( 1 + e^{\frac{(d_0)^2}{2}} \Big)
-\end{equation}
-
-The transform was implemented by a convolution between the complex conjuguate of the Morlet wavelet (Equation {Morlet}) and the signal $S(t)$, i.e.:
-
-\begin{equation}
-W(f, t) = \int_{-T_f}^{T_f} \Big( S(t-s)- \langle S \rangle_{t,T_f}  \Big) \cdot \overline{M_{d_0}(f, s)} \, ds
-\label{eq:wavelet-transform}
-\end{equation}
-
-where $\langle S \rangle_{t,T_f}$ is the signal average in the window centered at $t$ of extent $T_f$. $T_f$ is the frequency-dependent window on which the convolution is performed, it was defined as the extent of the wavelet where its amplitude decays by $(1-e^{-4})$=98.2\%, i.e. $T_f=\sqrt{2} \frac{d_0}{\pi \, f}$. From Equation {wavelet-transform}, we computed the envelope and the phase at time $t$ of a given frequency $f$ in the signal by taking the norm and argument of the complex number $W(f, t)$.
-
-*** Computing the pLFP signal
-
-We consider a frequency band spanning [$f_0/w_0$, $f_0 \cdot w_0$], where $f_0$ is a root frequency and $w_0$ the width parameter of the band. We take a set of $N$={wavelet_number} wavelets uniformly spanning this band (i.e. evenly space from $f_0/w_0$ to $f_0 \cdot w_0$). The pLFP signal consists in the sum over $N$ of the $k$ wavelet envelopes of frequency $f_k \in [f_0/w_0, f_0 \cdot w_0]$, i.e.:
-
-\begin{equation}
-\textrm{pLFP}(t) = \sum_{k \in [1,N]} \frac{\| W(f_k, t) \|}{N}
-\label{eq:pLFP}
-\end{equation}
-
-This time-varying signal is then smoothed over time with a Gaussian filter to yield the final pLFP signal (see Figure {pLFP}a).
-
-*** Computing the Network State Index (NSI)
-
-[[Table {params} around here]]
-
-To improve the method's computational efficiency, the smoothed pLFP signal was subsampled in bins of {pLFP_subsampling}ms (keeping the 50kHz sampling of electrophysiological signals is unnecessary given the much slower time scale of state transitions, see Results). 
-We compute the distribution of the pLFP signal over the whole recording and we extract the lower bound of the pLFP signal $p_0$ by taking the value of the lowest $p_0^{frac}$=1\% fraction of the distribution. We interpret this recording-specific $p_0$ value as the residual high-gamma envelope in absence of neural activity (see the systematic depolarization from the activity at pLFP$\leq p_0$ in Figure {NSI}f) and we will therefore this value as an estimate of the noise level in the pLFP signal.
-
-We then compute the time-varying envelope of the {delta_band} band $\delta_{env}$ of the pLFP signal thanks to the above wavelet transform (Equation {wavelet-transform}). We take a set of 20 wavelets uniformly sampling the {delta_band} band and, at every {pLFP_subsampling}ms time point, we extract the maximum envelope from this band (and the phase of this maximum envelope in Figure {NSI}f). We construct a weighted estimate $X(t)$ of the low-frequency content of the pLFP signal by  $X(t) = p_0 + \alpha \delta_{env}$, where $\alpha$ is the threshold parameter for the rhythmic/non-rhythmic classification (see Results). We also compute a slow average of the pLFP fluctuations with a Gaussian smoothing of time constant $T_{mean}$={T_sliding_mean}ms, yielding the signal $Y(t)$. Finally, the Network State Index (NSI) is given by the formula:
-\begin{equation}
-\label{eq:NSI}
-\textrm{NSI}(t) = - 2 \cdot \delta_{env} \cdot \mathcal{H}(X-Y) + (Y-p_0) \cdot \mathcal{H}(Y-X)
-\end{equation}
-where $\mathcal{H}$ is the Heaviside function (i.e. step function).
-
-From this time-varying signal, we compute the "validated" network states by running through the time axis in steps of $T_{state}$/2={Tstate_update}ms and checking that the $T_{state}$={Tstate}ms window surrounding each time point does not contain variations of the NSI signal larger that a threshold $p_{fluct}^{thre}$. For the value of the $p_{fluct}^{thre}$ threshold, we took our estimate of the noise level, i.e. the $p_0$ value.
-
-The signal processing steps of this procedure are illustrated on Figure {NSI}a and all parameters of the analysis are summarized in Table {params}.
-
-*** Data Analysis and Statistics
-
-Data were analyzed with \texttt{SciPy} (Oliphant, 2007). The signal processing steps (filtering, convolution, subsampling, ...) were implemented in \texttt{numpy}. Statistics was performed with the \texttt{scipy.stats} module (t-tests, Pearson correlations). Multiple linear regressions were performed with the \texttt{OLS} (ordinary least squares) function of the \texttt{statsmodel} module. Experimental data were translated to Python using the \texttt{neo} module (Garcia et al., 2014). 
-
-*** Software implementation
-
-We implemented the described analysis into a publicly available software, see \url{https://github.com/yzerlaut/Waking_State_Index}. The software contains the described algorithm, a graphical user interface and the support to a few electrophysiological data formats.
-
 * Figures
 
 *** Network states of wakefulness in mice sensory cortex: electrophysiological signatures and characterizations based on spectral analysis
@@ -230,10 +159,10 @@ We implemented the described analysis into a publicly available software, see \u
 #+options : {'label':'All', 'extent': 'doublecolumn', 'file':'./Figures/Fig_All_cells.png'}
 (a) A 30s sample of the simultaneous $V_{ext}$ (grey trace) and $V_m$ (black trace) signals. At the bottom, we show the validated network states with their NSI value. (b) Histogram of the NSI over the whole recording for each cell. The color code per cell (from red to blue) represents the value of the correlation coefficient between the $V_m$ and pLFP signals. (c) Scatter plots of the "$V_m$-defined NSI" ($\textrm{NSI}_{V_m}$) and the "pLFP-defined NSI" ($\textrm{NSI}_{\textrm{pLFP}}$) values for all validated episode in a given cell (i.e., extending before and after the recording sample shown in *a*). We highlight the correct area with a green color and the uncorrect area with a red color. The red cross gives an example of the different sort of rejections that may happen given the cross-validation criteria (see main text). 
 
-*** Link between the NSI levels and the properties of the $V_m$ fluctuations.
+*** Relationship between network activity (captured by the NSI) and single cell depolarization: rhythmic vs non-rhythmic 
 #+options : {'label':'Granul', 'sidecap':(0.4, 0.06, 0.5), 'file':'./Figures/Fig_Granularity.png'}
-(a) Relationship, at the single cell level (shown for Cell 1), between the NSI levels and the properties of the $V_m$ fluctuations. For rhythmic states (NSI<0, purple color), we show the link between the NSI level and the $V_m$ amplitude of the {delta_band} envelope. For non-rhythmic states (NSI<0, kaki color), we show the link between the NSI level and the mean $V_m$ depolarization level over a $T_{state}$={Tstate}ms window. We bin the NSI levels and compute the mean (plain curve) and standard deviation (shaded area) for all episodes falling within this bin. We highlight with grey dots the values of the single episodes visible on Figure {NSI}a (reproduced on the top inset, $V_m$ in black and pLFP in brown). We estimate the dependency of the $V_m$ fluctuations with a linear regression with respect to the NSI level (red dashed curve).
-(b) Same than *a* for Cell 3. Note that the plain curve does not reach episode 3 because the minimum number of episodes is not reached at that level (see main text). 
+(a) Relationship, at the single cell level (shown for rec.\#1), between the NSI levels and the properties of the $V_m$ fluctuations. For rhythmic states (NSI<0, purple color), we show the link between the NSI level and the $V_m$ amplitude of the {delta_band} envelope. For non-rhythmic states (NSI<0, kaki color), we show the link between the NSI level and the mean $V_m$ depolarization level over a $T_{state}$={Tstate}ms window. We bin the NSI levels and compute the mean (plain curve) and standard deviation (shaded area) for all episodes falling within this bin. We highlight with grey dots the values of the single episodes visible on Figure {NSI}a (reproduced on the top inset, $V_m$ in black and pLFP in brown). We estimate the dependency of the $V_m$ fluctuations with a linear regression with respect to the NSI level (red dashed curve).
+(b) Same than *a* for rec.\#11. Note that the plain curve does not reach episode 3 because the minimum number of episodes is not reached at that level (see main text). 
 (c) Reproducing the analysis of *a* over all n={Ncells} cells (see main text). We now consider only the mean relations over cells (thin gray lines). We show the mean (wide curve) and the standard deviation (shaded area) across cells (N.B. evaluated only for the NSI levels displayed by multiple cells, i.e. n={n_slopes_for_rhythmic_granularity_analysis} cells for rhythmic activity and n={n_slopes_for_nonrhythmic_granularity_analysis} cells for non-rhythmic activity). For each cell, we perform a linear regression with respect to the NSI levels, we compute the mean across cells $\langle s \rangle$ and the probability of a deviation from the 0-slope hypothesis $p$ (paired t-test). 
 (d) Link between the $\alpha$ parameter (that sets the proportion of non-rhythmic episodes, see Figure {NSI}c) and the mean slope over cells (top, $\langle s \rangle_{cells}$) as well as p-value for a significant non-zero slope (bottom). The slope value weakly depends on the $\alpha$ parameter, meaning that the weak dependency on the NSI level during rhythmic episodes can not be attributed to a too low sampling of rhythmic states under the setting $\alpha=\alpha^{opt}$=2.8 used in *a*,*b* and *c*.
 
@@ -314,6 +243,77 @@ Interpreting the pLFP signal (the high-gamma power of the extracellular recordin
 This last phenomenon was also found to be at the origin of the main limitation of the present characterization. Because of the occasionally low level of the pLFP signal during rhythmic activity, the NSI exhibits a bias toward low activity non-rhythmic states when evaluated from extracellular recordings (characterized from the $V_m$ recording). However, despite those limitations, the overall high matching value obtained through cross-validation ($\sim$80\% correct) suggests that the NSI is a valid index to characterize the various network states of wakefulness. 
 
 Given the widespread use of extracellular recordings in neuroscientific research (Panzeri et al., 2015) and the relevance of state modulation in sensory processing (Ayaz et al., 2013; Busse et al., 2017; Bennett et al., 2013; Dadarlat and Stryker, 2017; Destexhe, 2011; Ecker et al., 2014; Einstein et al., 2017; Fu et al., 2014; Lee et al., 2014; McGinley et al., 2015a; Niell and Stryker, 2010; Pachitariu et al., 2015; Pakan et al., 2016; Pinto et al., 2013; Polack et al., 2013; Reimer et al., 2014; Vinck et al., 2015; Zhou et al., 2014), the present characterization might turn out an important methodological advance to unveil the mechanisms and functions of state-dependent computations in neocortex.
+
+* Methods
+
+*** Animals 
+
+Experimental procedures involving animals have been approved by the IIT Animal Welfare Body and by the Italian Ministry of Health (authorization \# 34/2015-PR and 125/2012-B), in accordance with the National legislation (D.Lgs. 26/2014) and the European legislation (European Directive 2010/63/EU). Experiments were performed on young-adult (4-6 weeks old, either sex) C57BL/6J mice (Charles River, Calco, Italy). The animals were housed in a 12:12 hr light-dark cycle in singularly ventilated cages, with access to food and water ad libitum.
+
+*** Simultaneous extra- and intracellular recordings in awake mice
+
+The experimental procedure for in vivo electrophysiological recordings in awake head-fixed mice have been previously described (Zucca et al., 2017). Briefly, custom metal plate were fixed on young (P22-P24) mice skull two weeks before the experimental sessions. After a 2-3 days recovery period, mice were habituated to sit quietly on the experimental setup for at least 7-10 days (one session per day and gradually increasing session duration). The day of the experiment, mice were anesthetized with 2.5\% isofluorane and a small craniotomy (0.5x0.5 mm) was opened over the somatosensory cortex and a 30 minutes long recovery period was provided to the animal before starting the recordings. Brain surface was kept moist with a HEPES-buffered artificial cerebrospinal fluid (aCSF). Extracellular recordings were performed by lowering a glass pipette filled with aCSF into the tissue with the deeper tip placed at $\sim$300 mm from pial surface. Simultaneous current-clamp patch-clamp recordings were carried out on superficial pyramidal neurons (100– 350 mm). 3–6 M$\Omega$ borosilicate glass pipettes (Hilgenberg, Malsfeld, Germany) were filled with an internal solution containing (in mM): K-gluconate 140, MgCl2 1, NaCl 8, Na2ATP 2, Na3GTP 0.5, HEPES 10, Tris-phosphocreatine 10 to pH 7.2 with KOH. Electrical signals were grounded at the top of the skull (at the location of the craniotomy) and were acquired using a Multiclamp 700B amplifier, filtered at 10 kHz, digitized at 50 kHz with a Digidata 1440 and stored with pClamp 10 (Axon Instruments, Union City, CA). Multi-Unit Activity (MUA) was computed by band-pass filtering (0.3-3 kHz) the extracellular potential $V_{ext}$ and taking the absolute value of the resulting signal (Einevoll et al., 2013).
+
+*** Wavelet Transform
+
+Our signal processing pipeline of the extracellular signal was based on the wavelet transform. We implemented a wavelet transform based on the Morlet wavelet, i.e. on the waveform:
+
+\begin{equation}
+M_{d_0}(f, t) = C_{d_0}(f) \cdot e^{2 i \pi f t} \cdot e^{-\big(\frac{\sqrt{2} \pi f t}{d_0}\big)^2}
+\label{eq:Morlet}
+\end{equation}
+where $f$ is the frequency of the wavelet and $d_0$ the decay parameter of the envelope. We kept a value of $d_0$=6 all along the study. The coefficient $C_{f, d_0}$ is the normalization coefficient of the wavelet. Note that, to keep a meaningful link with the physical units of the signal, we did not normalize the wavelet with respect to itself, but with respect to a sinusoid (otherwise the wavelet transform with standard normalization of a sinusoid of frequency $f$ and amplitude 1 has a value greater than 1 at the frequency $f$). The wavelet normalization coefficient was therefore defined, for a wavelet frequency $f$ and an extent $d_0$, as:
+
+\begin{equation}
+C_{d_0}(f) = \int_{-\infty}^{\infty} \cos (2 \pi f s) \cdot \overline{M_{d_0}(f, s)} \cdot ds = 
+\frac{d_0}{2 \sqrt{2 \pi } f} \Big( 1 + e^{\frac{(d_0)^2}{2}} \Big)
+\end{equation}
+
+The transform was implemented by a convolution between the complex conjuguate of the Morlet wavelet (Equation {Morlet}) and the signal $S(t)$, i.e.:
+
+\begin{equation}
+W(f, t) = \int_{-T_f}^{T_f} \Big( S(t-s)- \langle S \rangle_{t,T_f}  \Big) \cdot \overline{M_{d_0}(f, s)} \, ds
+\label{eq:wavelet-transform}
+\end{equation}
+
+where $\langle S \rangle_{t,T_f}$ is the signal average in the window centered at $t$ of extent $T_f$. $T_f$ is the frequency-dependent window on which the convolution is performed, it was defined as the extent of the wavelet where its amplitude decays by $(1-e^{-4})$=98.2\%, i.e. $T_f=\sqrt{2} \frac{d_0}{\pi \, f}$. From Equation {wavelet-transform}, we computed the envelope and the phase at time $t$ of a given frequency $f$ in the signal by taking the norm and argument of the complex number $W(f, t)$.
+
+*** Computing the pLFP signal
+
+We consider a frequency band spanning [$f_0/w_0$, $f_0 \cdot w_0$], where $f_0$ is a root frequency and $w_0$ the width parameter of the band. We take a set of $N$={wavelet_number} wavelets uniformly spanning this band (i.e. evenly space from $f_0/w_0$ to $f_0 \cdot w_0$). The pLFP signal consists in the sum over $N$ of the $k$ wavelet envelopes of frequency $f_k \in [f_0/w_0, f_0 \cdot w_0]$, i.e.:
+
+\begin{equation}
+\textrm{pLFP}(t) = \sum_{k \in [1,N]} \frac{\| W(f_k, t) \|}{N}
+\label{eq:pLFP}
+\end{equation}
+
+This time-varying signal is then smoothed over time with a Gaussian filter to yield the final pLFP signal (see Figure {pLFP}a).
+
+*** Computing the Network State Index (NSI)
+
+[[Table {params} around here]]
+
+To improve the method's computational efficiency, the smoothed pLFP signal was subsampled in bins of {pLFP_subsampling}ms (keeping the 50kHz sampling of electrophysiological signals is unnecessary given the much slower time scale of state transitions, see Results). 
+We compute the distribution of the pLFP signal over the whole recording and we extract the lower bound of the pLFP signal $p_0$ by taking the value of the lowest $p_0^{frac}$=1\% fraction of the distribution. We interpret this recording-specific $p_0$ value as the residual high-gamma envelope in absence of neural activity (see the systematic depolarization from the activity at pLFP$\leq p_0$ in Figure {NSI}f) and we will therefore this value as an estimate of the noise level in the pLFP signal.
+
+We then compute the time-varying envelope of the {delta_band} band $\delta_{env}$ of the pLFP signal thanks to the above wavelet transform (Equation {wavelet-transform}). We take a set of 20 wavelets uniformly sampling the {delta_band} band and, at every {pLFP_subsampling}ms time point, we extract the maximum envelope from this band (and the phase of this maximum envelope in Figure {NSI}f). We construct a weighted estimate $X(t)$ of the low-frequency content of the pLFP signal by  $X(t) = p_0 + \alpha \delta_{env}$, where $\alpha$ is the threshold parameter for the rhythmic/non-rhythmic classification (see Results). We also compute a slow average of the pLFP fluctuations with a Gaussian smoothing of time constant $T_{mean}$={T_sliding_mean}ms, yielding the signal $Y(t)$. Finally, the Network State Index (NSI) is given by the formula:
+\begin{equation}
+\label{eq:NSI}
+\textrm{NSI}(t) = - 2 \cdot \delta_{env} \cdot \mathcal{H}(X-Y) + (Y-p_0) \cdot \mathcal{H}(Y-X)
+\end{equation}
+where $\mathcal{H}$ is the Heaviside function (i.e. step function).
+
+From this time-varying signal, we compute the "validated" network states by running through the time axis in steps of $T_{state}$/2={Tstate_update}ms and checking that the $T_{state}$={Tstate}ms window surrounding each time point does not contain variations of the NSI signal larger that a threshold $p_{fluct}^{thre}$. For the value of the $p_{fluct}^{thre}$ threshold, we took our estimate of the noise level, i.e. the $p_0$ value.
+
+The signal processing steps of this procedure are illustrated on Figure {NSI}a and all parameters of the analysis are summarized in Table {params}.
+
+*** Data Analysis and Statistics
+
+Data were analyzed with \texttt{SciPy} (Oliphant, 2007). The signal processing steps (filtering, convolution, subsampling, ...) were implemented in \texttt{numpy}. Statistics was performed with the \texttt{scipy.stats} module (t-tests, Pearson correlations). Multiple linear regressions were performed with the \texttt{OLS} (ordinary least squares) function of the \texttt{statsmodel} module. Experimental data were translated to Python using the \texttt{neo} module (Garcia et al., 2014). 
+
+*** Software implementation
+
+We implemented the described analysis into a publicly available software, see \url{https://github.com/yzerlaut/Waking_State_Index}. The software contains the described algorithm, a graphical user interface and the support to a few electrophysiological data formats.
 
 * References
 
