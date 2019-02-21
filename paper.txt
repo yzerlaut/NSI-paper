@@ -183,7 +183,7 @@ We conclude that, in the present dataset, the average correlation between a sing
 
 *** Summary of the parameters of the NSI characterization.
 #+options : {'label':'params'} 
-Note that the $p_0$ and $p_{fluct}^{thre}$ parameters are data-driven quantities, , i.e. varying from recording to recording, deriving from the value of $p_{0}^{frac}$. Across our n={Ncells} recordings, their values were $p_0$=$p_{fluct}^{thre}$={p0_over_cells}$\mu$V.
+Note that the $p_0$ and $p_{fluct}^{thre}$ parameters are data-driven quantities, i.e. varying from recording to recording, deriving from the value of $p_{0}^{frac}$. Across our n={Ncells} recordings, their values were $p_0$=$p_{fluct}^{thre}$={p0_over_cells}$\mu$V.
 |-----------------------------------------+--------------------+--------------------------|
 | Parameter                               | Symbol             | Value                    |
 |-----------------------------------------+--------------------+--------------------------|
