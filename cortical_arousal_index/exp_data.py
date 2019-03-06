@@ -56,10 +56,14 @@ def show_dataset(directory):
 
 def load_data(fn, args,
               fraction_extent_of_data=[0., 1.], # for cross-validation
+              verbose=False,
+              with_spiking_activity=True,
               chosen_window_only=True,
               full_processing=False,
               with_Vm_low_freq=False):
 
+    if verbose:
+        print('analyzing :', fn)
     with open(fn.replace(s1, s2).replace('abf', 'json')) as f: props = json.load(f)
     
     if chosen_window_only:
@@ -92,12 +96,18 @@ def load_data(fn, args,
 
     if full_processing:
         # compute the pLFP
+        if verbose:
+            print('processing LFP')
         functions.preprocess_LFP(data,
                                  freqs=np.linspace(args.f0/args.w0, args.f0*args.w0, args.wavelet_number),
                                  new_dt=args.subsampling_period,
                                  percentile_for_p0=args.percentile_for_p0,
                                  smoothing=args.T0)
+        data['pLFP'] = data['pLFP'][:min([len(data['pLFP']), len(data['sbsmpl_t'])])]
+        
         # compute the Network State Index
+        if verbose:
+            print('computing NSI')
         functions.compute_Network_State_Index(data,
                                               freqs=np.linspace(args.delta_band[0], args.delta_band[1], 8), # freqs in delta band
                                               Tstate=args.Tstate,
@@ -107,22 +117,27 @@ def load_data(fn, args,
                                               with_Vm_low_freq=with_Vm_low_freq)
         
         # extract delta and gamma power from LFP
+        if verbose:
+            print('computing delta and gamma')
         functions.compute_delta_and_gamma(data, args)
         
         # MUA from extracellular signal
-        data['MUA'] = gaussian_smoothing(\
-                        np.abs(butter_bandpass_filter(data['Extra'],\
-                                 args.MUA_band[0], args.MUA_band[1], 1./data['dt'], order=5)),\
-                                       int(args.MUA_smoothing/data['dt']))
+        if with_spiking_activity:
+            if verbose:
+                print('computing MUA, spikes and FR')
+            data['MUA'] = gaussian_smoothing(\
+                            np.abs(butter_bandpass_filter(data['Extra'],\
+                                     args.MUA_band[0], args.MUA_band[1], 1./data['dt'], order=5)),\
+                                           int(args.MUA_smoothing/data['dt']))
 
-        data['sbsmpl_MUA'] = 1e-3*data['MUA'][::int(args.subsampling_period/data['dt'])][:-1] # in uV
-        # Spike times from Vm
-        data['tspikes'] = data['t'][np.argwhere((data['Vm'][:-1]<=args.spike_threshold) & (data['Vm'][1:]>args.spike_threshold)).flatten()]
-        Vpeaks = []
-        for tt in data['tspikes']:
-            Vpeaks.append(np.max(data['Vm'][(data['t']>tt-5e-3) & (data['t']<tt+5e-3)])) # max in Vm surrouding spike time
-        data['Vpeak_spikes'] = np.array(Vpeaks)
-        data['sbsmpl_FR'] = np.histogram(data['tspikes'], bins=data['sbsmpl_t'])[0]/data['sbsmpl_dt']
+            data['sbsmpl_MUA'] = 1e-3*data['MUA'][::int(args.subsampling_period/data['dt'])][:-1] # in uV
+            # Spike times from Vm
+            data['tspikes'] = data['t'][np.argwhere((data['Vm'][:-1]<=args.spike_threshold) & (data['Vm'][1:]>args.spike_threshold)).flatten()]
+            Vpeaks = []
+            for tt in data['tspikes']:
+                Vpeaks.append(np.max(data['Vm'][(data['t']>tt-5e-3) & (data['t']<tt+5e-3)])) # max in Vm surrouding spike time
+            data['Vpeak_spikes'] = np.array(Vpeaks)
+            data['sbsmpl_FR'] = np.histogram(data['tspikes'], bins=data['sbsmpl_t'])[0]/data['sbsmpl_dt']
 
     return data
 
