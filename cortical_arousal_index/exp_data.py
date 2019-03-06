@@ -55,6 +55,7 @@ def show_dataset(directory):
 ###############################################################
 
 def load_data(fn, args,
+              fraction_extent_of_data=[0., 1.], # for cross-validation
               chosen_window_only=True,
               full_processing=False,
               with_Vm_low_freq=False):
@@ -68,9 +69,13 @@ def load_data(fn, args,
         
     raw_data = load_file(fn, zoom=[t0, t1])
     
-    data = {'t':raw_data[0]-raw_data[0][0],
-            'Vm':raw_data[1][1],
-            'Extra':raw_data[1][0],
+    data_full = {'t':raw_data[0]-raw_data[0][0],
+                 'Vm':raw_data[1][1],
+                 'Extra':raw_data[1][0]}
+    # in case
+    cond = (np.arange(len(data_full['t']))>=int(len(data_full['t'])*fraction_extent_of_data[0])) &\
+           (np.arange(len(data_full['t']))<=int(len(data_full['t'])*fraction_extent_of_data[1]))
+    data = {'t':data_full['t'][cond], 'Vm':data_full['Vm'][cond], 'Extra':data_full['Extra'][cond],
             'name':fn.split(os.path.sep)[-1],
             'filename':fn}
     
@@ -402,6 +407,7 @@ def test_different_alpha(args):
         FILENAMES.append(cell['files'][0])
         print('Cell '+str(icell+1)+' :', FILENAMES[-1])
         DATA.append(load_data(FILENAMES[-1], args,
+                              fraction_extent_of_data=args.data_fraction,
                               full_processing=True,
                               with_Vm_low_freq=True))
         
@@ -948,6 +954,8 @@ if __name__=='__main__':
     # parameters of Multi-Unit-Activity (MUA)
     parser.add_argument('--MUA_band', nargs='+', type=float, default=[300., 3000.])
     parser.add_argument('--MUA_smoothing', type=float, default=20e-3)
+    # DATA fraction, for the cross-validation analysis
+    parser.add_argument('--data_fraction', nargs='+', type=float, default=[0., 1.])
     
     args = parser.parse_args()
 
