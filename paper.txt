@@ -452,7 +452,6 @@ We summarize here all analysis parameters. We separate the parameters into two c
 \normalfont
 \end{table}
 
-
 *** nice table
 
 \begin{table}[tb!]
@@ -485,9 +484,10 @@ Sliding mean window  & $T_{mean} & {T_sliding_mean}ms \\[.5em]
 \caption{\label{table:params} \small \textbf{Summary of the parameters of the NSI characterization.} Note that the $p_0$ and $p_{fluct}^{thre}$ parameters are data-driven quantities, , i.e. varying from recording to recording, deriving from the value of $p_{0}^{frac}$. Across our n={Ncells} recordings, their values were $p_0$=$p_{fluct}^{thre}$={p0_over_cells}$\mu$V. \normalfont}
 \end{table}
 
-
 *** problematic legend
 **** Network states of wakefulness in mice sensory cortex: electrophysiological signatures and characterizations based on spectral analysis
 #+options : {'label':'data', 'extent': 'doublecolumn', 'file':'./Figures/Fig_dataset.png'}
 (a) Two example simultaneous recording (top: rec.\#2, bottom: rec.\#11) of the extracellular potential $V_{ext}$ and of the membrane potential $V_{m}$ of layer II/III pyramidal cell in awake mouse. (b) Sample episodes of duration 1.5 s extracted from rec.\#11 at the times points highlighted in *a* ($V_{ext}$ on top and $V_{m}$ on the bottom panel). In the middle panel, we analyze the $V_{ext}$ fluctuations, we show: the time-varying standard deviation $\sigma_{(V_{ext})}$ evaluated over a {T_sliding_mean} ms window (brown line), the envelope of the {delta_band} envelope of the fluctuations $\delta_{env}$ (green line) and the envelope of the [30,80]Hz component of the fluctuations $\gamma_{env}$ (pink line). (c) Histograms of the absolute correlation coefficient between $V_{ext}$ and $V_{m}$ per recording. The color code, from blue to orange, sorts the recordings according to this measure. (d) Histogram of the $\delta$ envelope (left), the $\gamma$ envelope (right) in $V_{ext}$ over the whole recording for each recording (color-code following *c*). In the top inset, we show the histogram of $\gamma$-to-$\delta$ ratio per recording. (e) Mean polarization level (shown as mean $\pm$ s.e.m over episodes at a given $\gamma$/$\delta$ level) as a function of the $\gamma$-to-$\delta$ ratio for a single recording (rec.\#11). We highlight how the $\gamma$/$\delta$ measure classifies the episodes shown in *b* (see main text). (f) Mean polarization level of as a function of the $\gamma$-to-$\delta$ ratio for the n={N_recordings} recordings of the dataset. We show the mean relation per cell (color-code following *c*) and the mean and variability over cells (black curve and grey area, respectively). (g) Relationship between Multi-Unit-Activity (MUA, see Methods) and $\gamma$-to-$\delta$ ratio over episodes for all cells (as in *f*: the relation for each cell is color-coded and the mean $\pm$ s.e.m over cells is shown in black and grey).
 
+
+** Supplementary
