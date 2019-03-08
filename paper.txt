@@ -330,6 +330,15 @@ Data were analyzed with \texttt{SciPy} (Oliphant, 2007). The signal processing s
 
 We implemented the described analysis into a publicly available software on the following \url{https://github.com/yzerlaut/Waking_State_Index/blob/master/README.md}. The software contains the described algorithm, a graphical user interface and the support to a few electrophysiological data formats.
 
+* Supplementary Figures
+
+*** Contribution of the parameter estimation in the estimation  on the Network states of wakefulness in mice sensory cortex: electrophysiological signatures and characterizations based on spectral analysis
+#+options : {'label':'segmenting', 'extent': 'doublecolumn', 'file':'./Figures/Fig_Splitting_Dataset.png'}
+(a) We consider different segmentation for the analysis of the dataset: we fit $\alpha^{opt}$ and we estimate the accuracy on the full dataset (grey label, as in the main text), or we consider a given fraction of the data to fit $\alpha^{opt}$ and the rest of the dataset to estimate the accuracy of the classification (see the schematic of the dataset segmentation for the different cases considered).
+(b) Mean $\delta$ envelope in the rythmic states (see main text and Figure {NSI}c) as a function of the $\alpha$ parameter for the different cases of dataset segmentation. Color code as in *a*. We show the mean $\pm$ s.e.m over the n={N_recordings} cells.
+(c) Estimated $\alpha^{opt}$ obtained from the fitting of an exponential decay of the curves shown in *b* (see Methods and Figure {NSI}c). Note the narrow range of variations of $\alpha^{opt}$ (from 2.7 to 3.1) for the different cases of variations. Color code as in *a*.
+(d) Estimate of the NSI classification accuracy obtained from comparing the $V_m$-defined and pLFP-defined NSI measure (see main text and Figure {All}c). We show the mean $\pm$ s.e.m over the n={N_recordings} cells. All cases were found not to differ significantly from the accuracy reported in the main text, from left to right the different p=0.12, p=0.22, p=0.52, p=0.44 (paired student t-test). Color code as in *a*.
+
 * Notes :noexport:
 
 *** pieces of intro
@@ -490,4 +499,4 @@ Sliding mean window  & $T_{mean} & {T_sliding_mean}ms \\[.5em]
 (a) Two example simultaneous recording (top: rec.\#2, bottom: rec.\#11) of the extracellular potential $V_{ext}$ and of the membrane potential $V_{m}$ of layer II/III pyramidal cell in awake mouse. (b) Sample episodes of duration 1.5 s extracted from rec.\#11 at the times points highlighted in *a* ($V_{ext}$ on top and $V_{m}$ on the bottom panel). In the middle panel, we analyze the $V_{ext}$ fluctuations, we show: the time-varying standard deviation $\sigma_{(V_{ext})}$ evaluated over a {T_sliding_mean} ms window (brown line), the envelope of the {delta_band} envelope of the fluctuations $\delta_{env}$ (green line) and the envelope of the [30,80]Hz component of the fluctuations $\gamma_{env}$ (pink line). (c) Histograms of the absolute correlation coefficient between $V_{ext}$ and $V_{m}$ per recording. The color code, from blue to orange, sorts the recordings according to this measure. (d) Histogram of the $\delta$ envelope (left), the $\gamma$ envelope (right) in $V_{ext}$ over the whole recording for each recording (color-code following *c*). In the top inset, we show the histogram of $\gamma$-to-$\delta$ ratio per recording. (e) Mean polarization level (shown as mean $\pm$ s.e.m over episodes at a given $\gamma$/$\delta$ level) as a function of the $\gamma$-to-$\delta$ ratio for a single recording (rec.\#11). We highlight how the $\gamma$/$\delta$ measure classifies the episodes shown in *b* (see main text). (f) Mean polarization level of as a function of the $\gamma$-to-$\delta$ ratio for the n={N_recordings} recordings of the dataset. We show the mean relation per cell (color-code following *c*) and the mean and variability over cells (black curve and grey area, respectively). (g) Relationship between Multi-Unit-Activity (MUA, see Methods) and $\gamma$-to-$\delta$ ratio over episodes for all cells (as in *f*: the relation for each cell is color-coded and the mean $\pm$ s.e.m over cells is shown in black and grey).
 
 
-** Supplementary
+** Supplementary Text
