@@ -2,8 +2,8 @@ Title: Identifying Network States from Extracellular Recordings during Wakefulne
 Short Title: Identifying Waking States from Extracellular Recordings
 Affiliations: {1} Neural Coding Laboratory, Istituto Italiano di Tecnologia, Genova and Rovereto, Italy. {2} Neural Computation Laboratory, Center for Neuroscience and Cognitive Systems @UniTn, Istituto Italiano di Tecnologia, Rovereto, Italy. {3} Optical Approaches to Brain Function Laboratory, Istituto Italiano di Tecnologia, Genova, Italy.
 Correspondence: Y.Z. ([[yann.zerlaut@iit.it]]), S.P. ([[stefano.panzeri@iit.it]]), T.F. ([[tommaso.fellin@iit.it]])
-Authors: Yann Zerlaut{1,2}*, Stefano Zucca{1,3}, Stefano Panzeri{1,2}* and Tommaso Fellin{1,3}*
-Short Authors: Zerlaut, Zucca, Panzeri \& Fellin
+Authors: Yann Zerlaut{1,2}*, Stefano Zucca{1,3}, Tommaso Fellin{1,3}* and Stefano Panzeri{1,2}* 
+Short Authors: Zerlaut, Zucca, Fellin \& Panzeri
 Keywords: waking states; extracellular recordings; state-dependent cortical processing; rodent somatosensory cortex
 Funding: Research funded by the European Research Council (NEURO-PATTERNS), the FP7-602531 (DESIRE), and, in part, the Flag-Era Joint Transnational Call (SLOW-DYN).
 
@@ -330,15 +330,6 @@ Data were analyzed with \texttt{SciPy} (Oliphant, 2007). The signal processing s
 
 We implemented the described analysis into a publicly available software on the following \url{https://github.com/yzerlaut/Waking_State_Index/blob/master/README.md}. The software contains the described algorithm, a graphical user interface and the support to a few electrophysiological data formats.
 
-* Supplementary Figures
-
-*** Contribution of the parameter estimation in the estimation  on the Network states of wakefulness in mice sensory cortex: electrophysiological signatures and characterizations based on spectral analysis
-#+options : {'label':'segmenting', 'extent': 'doublecolumn', 'file':'./Figures/Fig_Splitting_Dataset.png'}
-(a) We consider different segmentation for the analysis of the dataset: we fit $\alpha^{opt}$ and we estimate the accuracy on the full dataset (grey label, as in the main text), or we consider a given fraction of the data to fit $\alpha^{opt}$ and the rest of the dataset to estimate the accuracy of the classification (see the schematic of the dataset segmentation for the different cases considered).
-(b) Mean $\delta$ envelope in the rythmic states (see main text and Figure {NSI}c) as a function of the $\alpha$ parameter for the different cases of dataset segmentation. Color code as in *a*. We show the mean $\pm$ s.e.m over the n={N_recordings} cells.
-(c) Estimated $\alpha^{opt}$ obtained from the fitting of an exponential decay of the curves shown in *b* (see Methods and Figure {NSI}c). Note the narrow range of variations of $\alpha^{opt}$ (from 2.7 to 3.1) for the different cases of variations. Color code as in *a*.
-(d) Estimate of the NSI classification accuracy obtained from comparing the $V_m$-defined and pLFP-defined NSI measure (see main text and Figure {All}c). We show the mean $\pm$ s.e.m over the n={N_recordings} cells. All cases were found not to differ significantly from the accuracy reported in the main text, from left to right the different p=0.12, p=0.22, p=0.52, p=0.44 (paired student t-test). Color code as in *a*.
-
 * Notes :noexport:
 
 *** pieces of intro
@@ -500,3 +491,13 @@ Sliding mean window  & $T_{mean} & {T_sliding_mean}ms \\[.5em]
 
 
 ** Supplementary Text
+** Supplementary
+** Supplementary Figures
+
+*** Segmenting the dataset to perform the $\alpha^{opt}$ fitting and the accuracy estimate.
+#+options : {'label':'segmenting', 'extent': 'doublecolumn', 'file':'./Figures/Fig_Splitting_Dataset.png'}
+(a) We consider different segmentation for the analysis of the dataset: we fit $\alpha^{opt}$ and we estimate the accuracy on the full dataset (grey label, as in the main text), or we consider a given fraction of the data to fit $\alpha^{opt}$ and the rest of the dataset to estimate the accuracy of the classification (see the schematic of the dataset segmentation for the different cases considered).
+(b) Mean $\delta$ envelope in the rythmic states (see main text and Figure {NSI}c) as a function of the $\alpha$ parameter for the different cases of dataset segmentation. Color code as in *a*. We show the mean $\pm$ s.e.m over the n={N_recordings} cells.
+(c) Estimated $\alpha^{opt}$ obtained from the fitting of an exponential decay of the curves shown in *b* (see Methods and Figure {NSI}c). Note the narrow range of variations of $\alpha^{opt}$ (from 2.7 to 3.1) for the different cases of variations. Color code as in *a*.
+(d) Estimate of the NSI classification accuracy obtained from comparing the $V_m$-defined and pLFP-defined NSI measure (see main text and Figure {All}c). We show the mean $\pm$ s.e.m over the n={N_recordings} cells. All cases were found not to differ significantly from the accuracy reported in the main text, from left to right the different p=0.12, p=0.22, p=0.52, p=0.44 (paired student t-test). Color code as in *a*.
+

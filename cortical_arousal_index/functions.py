@@ -191,11 +191,8 @@ def compute_delta_and_gamma(data, args,
     gamma_freqs = np.linspace(args.gamma_band[0], args.gamma_band[1], 20)
     
     # delta as max power in [2,10]Hz band
-    data[target_key+'_delta_power'] = np.max(np.abs(my_cwt(data['sbsmpl_Extra'].flatten(), delta_freqs, data['sbsmpl_dt'])), axis=0)
+    data[target_key+'_delta_power'] = np.max(np.abs(my_cwt(data['sbsmpl_'+target_key].flatten(), delta_freqs, data['sbsmpl_dt'])), axis=0)
     # gamma as max power in [30,80]Hz band
-    data[target_key+'_gamma_power'] = np.max(np.abs(my_cwt(data['sbsmpl_Extra'].flatten(), gamma_freqs, data['sbsmpl_dt'])), axis=0)
+    data[target_key+'_gamma_power'] = np.max(np.abs(my_cwt(data['sbsmpl_'+target_key].flatten(), gamma_freqs, data['sbsmpl_dt'])), axis=0)
         
         
-
-if __name__=='__main__':
-    print(gaussian_smoothing(np.linspace(0,100,50), 1.3)) # translating to integer values... so keep in mind
